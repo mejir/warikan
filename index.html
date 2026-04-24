@@ -278,22 +278,7 @@
       border-radius: 7px;
     }
     .btn-line-item    { background: #d4edda; color: #155724; }
-    .btn-discord-item { background: #ebf0ff; color: #3c4bab; }
-    [data-theme="dark"] .btn-line-item    { background: #1c4532; color: #9ae6b4; }
-    [data-theme="dark"] .btn-discord-item { background: #2a3670; color: #bec8ff; }
-
-    /* Discord URL 入力エリア（折りたたみ） */
-    .discord-url-area {
-      display: none;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .discord-url-area.open { display: flex; }
-    .discord-url-area input { font-size: 0.82rem; padding: 8px 10px; }
-
-    .btn-discord-send { background: #3c4bab; color: #fff; flex: 0 0 auto; padding: 10px 14px; }
-    [data-theme="dark"] .btn-discord-send { background: #4a5bcc; }
+    [data-theme="dark"] .btn-line-item { background: #1c4532; color: #9ae6b4; }
 
     /* テーブル横スクロール（モバイル対応） */
     .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -556,16 +541,9 @@
       <button class="btn-copy" onclick="copyResult()">📋 コピー</button>
       <button class="btn-share-toggle" id="shareToggleBtn" onclick="toggleSharePanel()">📤 共有する ▾</button>
     </div>
-    <!-- 共有パネル（LINEまたはDiscordを選択） -->
+    <!-- 共有パネル -->
     <div class="share-panel" id="sharePanel">
       <button class="btn-share-item btn-line-item" onclick="shareToLine()">💬 LINEで送る</button>
-      <button class="btn-share-item btn-discord-item" id="discordToggleBtn" onclick="toggleDiscordInput()">🎮 Discordへ送信 ▾</button>
-      <!-- Discord URL入力（Discordボタン押下で展開） -->
-      <div class="discord-url-area" id="discordUrlArea">
-        <input type="url" id="discordUrl" placeholder="Discord Webhook URL" spellcheck="false" autocomplete="off">
-        <button class="btn-sm" onclick="saveDiscordUrl()" title="このURLをデフォルトとして保存">💾 保存</button>
-        <button class="btn-discord-send" id="discordSendBtn" onclick="sendToDiscord()">送信</button>
-      </div>
     </div>
 
     <button class="btn-rst" onclick="resetAll()">🔄 リセット</button>
@@ -577,15 +555,12 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  // ===== 定数 =====
-  // Discord Webhook URL の固定デフォルト値（使用するURLに書き換えてください）
-  const DEFAULT_DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1497162091423862904/DZC5Kg2cEF0zsC5ywFhB6Xy8KZKaMvmsuqVeXN7et-ni_IehZFPGjN-vSU0zg2othnJa';
-
   // ===== 状態 =====
   const state = {
     members:   [],
     payments:  [],
-    editIndex: -1
+    editIndex: -1,
+    lastCalc:  null
   };
 
   let pendingSaved = null;
@@ -911,6 +886,8 @@
       `;
     }
 
+    state.lastCalc = { floorShare, paid, balance, transfers };
+
     $('result').style.display = 'block';
     $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -941,24 +918,46 @@
     return transfers;
   }
 
-  // ===== 結果テキスト生成（コピー・LINE・Discord 共通） =====
+  // ===== 結果テキスト生成（コピー・LINE 共通） =====
   function buildResultText() {
-    const items = $('transferResult').querySelectorAll('.transfer-list li');
-    const lines = ['【割り勘精算結果】'];
+    if (!state.lastCalc) return '';
+    const { floorShare, paid, balance, transfers } = state.lastCalc;
 
-    if (items.length === 0) {
-      lines.push('精算不要です。全員均等に支払っています。');
+    const lines = ['【割り勘精算計算機】', ''];
+
+    // 支払い内訳
+    lines.push('📋 支払い内訳');
+    state.payments.forEach(p => {
+      const amtStr  = '¥' + p.amount.toLocaleString('ja-JP');
+      const hasDesc = p.desc && p.desc !== '（記録なし）';
+      lines.push(hasDesc ? `・${p.payer} ${amtStr} (${p.desc})` : `・${p.payer} ${amtStr}`);
+    });
+    lines.push('');
+
+    // 収支サマリー
+    lines.push('💰 収支サマリー');
+    state.members.forEach(m => {
+      const b        = balance[m];
+      const sign     = b > 0 ? '+' : b < 0 ? '-' : '';
+      const paidStr  = '¥' + paid[m].toLocaleString('ja-JP');
+      const shareStr = '¥' + floorShare.toLocaleString('ja-JP');
+      const balStr   = sign + '¥' + Math.abs(b).toLocaleString('ja-JP');
+      lines.push(`・${m} 支払 ${paidStr} / 負担 ${shareStr} / ${balStr}`);
+    });
+    lines.push('');
+
+    // 最小送金プラン
+    if (transfers.length === 0) {
+      lines.push('📤 精算不要（全員均等）');
     } else {
-      lines.push(`合計${items.length}回の送金で精算できます。`);
-      lines.push('');
-      items.forEach(li => {
-        const s = li.querySelectorAll('span');
-        lines.push(`${s[0].textContent} → ${s[2].textContent}　${s[3].textContent}`);
+      lines.push(`📤 最小送金プラン（合計${transfers.length}回）`);
+      transfers.forEach(t => {
+        lines.push(`${t.from} → ${t.to}　¥${t.amount.toLocaleString('ja-JP')}`);
       });
     }
 
     lines.push('');
-    lines.push('💰 PayPayで送る: https://paypay.ne.jp/');
+    lines.push('💰 PayPayで送る: paypay://');
 
     return lines.join('\n');
   }
@@ -992,74 +991,12 @@
     const btn   = $('shareToggleBtn');
     const open  = panel.classList.toggle('open');
     btn.textContent = open ? '📤 共有する ▴' : '📤 共有する ▾';
-    if (!open) {
-      $('discordUrlArea').classList.remove('open');
-      $('discordToggleBtn').textContent = '🎮 Discordへ送信 ▾';
-    }
-  }
-
-  function toggleDiscordInput() {
-    const area = $('discordUrlArea');
-    const btn  = $('discordToggleBtn');
-    const open = area.classList.toggle('open');
-    btn.textContent = open ? '🎮 Discordへ送信 ▴' : '🎮 Discordへ送信 ▾';
-    if (open) {
-      // localStorageの保存値 → なければ定数デフォルト値で補完
-      if (!$('discordUrl').value) {
-        try {
-          $('discordUrl').value = localStorage.getItem('warikan_discord_url') || DEFAULT_DISCORD_WEBHOOK_URL;
-        } catch(e) {
-          $('discordUrl').value = DEFAULT_DISCORD_WEBHOOK_URL;
-        }
-      }
-      $('discordUrl').focus();
-    }
   }
 
   // ===== LINE シェア =====
   function shareToLine() {
-    const url = 'https://line.me/R/msg/text/?' + encodeURIComponent(buildResultText());
-    window.open(url, '_blank', 'noopener,noreferrer');
-  }
-
-  // ===== Discord Webhook URL 保存 =====
-  function saveDiscordUrl() {
-    const url = $('discordUrl').value.trim();
-    try { localStorage.setItem('warikan_discord_url', url); } catch(e) {}
-    showToast('💾 Webhook URLを保存しました');
-  }
-
-  // ===== Discord Webhook 送信 =====
-  async function sendToDiscord() {
-    const url = $('discordUrl').value.trim();
-    const btn = $('discordSendBtn');
-
-    if (!url) {
-      showToast('⚠️ Webhook URLを入力してください', 3000);
-      $('discordUrl').focus();
-      return;
-    }
-    if (!/^https:\/\/(discord\.com|discordapp\.com)\/api\/webhooks\//.test(url)) {
-      showToast('⚠️ 有効なDiscord Webhook URLを入力してください', 3500);
-      return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = '送信中...';
-
-    try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: buildResultText() })
-      });
-      showToast(res.ok ? '✅ Discordへ送信しました' : `⚠️ 送信失敗（HTTP ${res.status}）`, 3500);
-    } catch(e) {
-      showToast('⚠️ 送信エラー。Webhook URLを確認してください', 3500);
-    } finally {
-      btn.disabled = false;
-      btn.textContent = '送信';
-    }
+    const lineUrl = 'https://line.me/R/msg/text/?' + encodeURIComponent(buildResultText());
+    window.open(lineUrl, '_blank', 'noopener,noreferrer');
   }
 
   // ===== リセット =====
@@ -1080,12 +1017,10 @@
     renderPayments();
     syncPayerSelect();
     updateCalcBtn();
-    $('paySubmitBtn').textContent  = '追加';
+    $('paySubmitBtn').textContent = '追加';
     $('editBanner').classList.remove('show');
     $('sharePanel').classList.remove('open');
-    $('discordUrlArea').classList.remove('open');
-    $('shareToggleBtn').textContent   = '📤 共有する ▾';
-    $('discordToggleBtn').textContent = '🎮 Discordへ送信 ▾';
+    $('shareToggleBtn').textContent = '📤 共有する ▾';
   }
 
   // ===== キーボード =====
