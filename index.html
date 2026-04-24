@@ -254,30 +254,8 @@
     .btn-copy         { background: #e6fffa; color: #234e52; flex: 0 0 auto; padding: 10px 14px; }
     [data-theme="dark"] .btn-copy { background: #234e52; color: #b2f5ea; }
 
-    /* 共有トグルボタン */
-    .btn-share-toggle { flex: 1; background: var(--btn-add-bg); color: var(--btn-add-text); }
-
-    /* 共有パネル（折りたたみ） */
-    .share-panel {
-      display: none;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 8px;
-      padding: 10px;
-      background: var(--row-bg);
-      border-radius: 8px;
-      border: 1px solid var(--border);
-    }
-    .share-panel.open { display: flex; }
-
-    /* パネル内の各共有ボタン */
-    .btn-share-item {
-      width: 100%;
-      text-align: left;
-      padding: 10px 14px;
-      border-radius: 7px;
-    }
-    .btn-line-item    { background: #d4edda; color: #155724; }
+    /* LINEシェアボタン */
+    .btn-line-item    { flex: 1; background: #d4edda; color: #155724; }
     [data-theme="dark"] .btn-line-item { background: #1c4532; color: #9ae6b4; }
 
     /* テーブル横スクロール（モバイル対応） */
@@ -536,14 +514,10 @@
     <div class="card-title">🔁 最小送金プラン</div>
     <div id="transferResult"></div>
 
-    <!-- コピー / 共有 -->
+    <!-- コピー / LINE -->
     <div class="share-row">
       <button class="btn-copy" onclick="copyResult()">📋 コピー</button>
-      <button class="btn-share-toggle" id="shareToggleBtn" onclick="toggleSharePanel()">📤 共有する ▾</button>
-    </div>
-    <!-- 共有パネル -->
-    <div class="share-panel" id="sharePanel">
-      <button class="btn-share-item btn-line-item" onclick="shareToLine()">💬 LINEで送る</button>
+      <button class="btn-line-item" onclick="shareToLine()">💬 LINEで送る</button>
     </div>
 
     <button class="btn-rst" onclick="resetAll()">🔄 リセット</button>
@@ -921,32 +895,18 @@
   // ===== 結果テキスト生成（コピー・LINE 共通） =====
   function buildResultText() {
     if (!state.lastCalc) return '';
-    const { floorShare, paid, balance, transfers } = state.lastCalc;
+    const { transfers } = state.lastCalc;
 
-    const lines = ['【割り勘精算計算機】', ''];
+    const lines = ['【割り勘精算結果】', ''];
 
-    // 支払い内訳
     lines.push('📋 支払い内訳');
     state.payments.forEach(p => {
-      const amtStr  = '¥' + p.amount.toLocaleString('ja-JP');
-      const hasDesc = p.desc && p.desc !== '（記録なし）';
-      lines.push(hasDesc ? `・${p.payer} ${amtStr} (${p.desc})` : `・${p.payer} ${amtStr}`);
+      const desc   = (p.desc && p.desc !== '（記録なし）') ? p.desc : '記録なし';
+      const amtStr = '¥' + p.amount.toLocaleString('ja-JP');
+      lines.push(`・${p.payer} ${amtStr}（${desc}）`);
     });
     lines.push('');
 
-    // 収支サマリー
-    lines.push('💰 収支サマリー');
-    state.members.forEach(m => {
-      const b        = balance[m];
-      const sign     = b > 0 ? '+' : b < 0 ? '-' : '';
-      const paidStr  = '¥' + paid[m].toLocaleString('ja-JP');
-      const shareStr = '¥' + floorShare.toLocaleString('ja-JP');
-      const balStr   = sign + '¥' + Math.abs(b).toLocaleString('ja-JP');
-      lines.push(`・${m} 支払 ${paidStr} / 負担 ${shareStr} / ${balStr}`);
-    });
-    lines.push('');
-
-    // 最小送金プラン
     if (transfers.length === 0) {
       lines.push('📤 精算不要（全員均等）');
     } else {
@@ -957,7 +917,8 @@
     }
 
     lines.push('');
-    lines.push('💰 PayPayで送る: paypay://');
+    lines.push('💰 PayPayで送る');
+    lines.push('https://bit.ly/warikan-pay');
 
     return lines.join('\n');
   }
@@ -983,14 +944,6 @@
     document.execCommand('copy');
     document.body.removeChild(el);
     showToast('📋 クリップボードにコピーしました');
-  }
-
-  // ===== 共有パネル トグル =====
-  function toggleSharePanel() {
-    const panel = $('sharePanel');
-    const btn   = $('shareToggleBtn');
-    const open  = panel.classList.toggle('open');
-    btn.textContent = open ? '📤 共有する ▴' : '📤 共有する ▾';
   }
 
   // ===== LINE シェア =====
@@ -1019,8 +972,6 @@
     updateCalcBtn();
     $('paySubmitBtn').textContent = '追加';
     $('editBanner').classList.remove('show');
-    $('sharePanel').classList.remove('open');
-    $('shareToggleBtn').textContent = '📤 共有する ▾';
   }
 
   // ===== キーボード =====
