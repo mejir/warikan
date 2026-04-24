@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>割り勘精算計算機</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2b6cb0">
+  <link rel="apple-touch-icon" href="icons/icon-192.svg">
+
+  <style>
+    /* ===== CSS変数（ライト／ダークモード） ===== */
+    :root {
+      --bg:            #f0f4f8;
+      --card:          #ffffff;
+      --text:          #2d3748;
+      --text-sub:      #718096;
+      --text-muted:    #a0aec0;
+      --border:        #cbd5e0;
+      --input-bg:      #f7fafc;
+      --tag-bg:        #ebf8ff;
+      --tag-border:    #bee3f8;
+      --tag-text:      #2b6cb0;
+      --primary:       #2b6cb0;
+      --primary-text:  #ffffff;
+      --btn-add-bg:    #ebf8ff;
+      --btn-add-text:  #2b6cb0;
+      --btn-del-bg:    #fff5f5;
+      --btn-del-text:  #c53030;
+      --btn-edit-bg:   #fefcbf;
+      --btn-edit-text: #744210;
+      --btn-rst-bg:    #e2e8f0;
+      --btn-rst-text:  #718096;
+      --tbl-head:      #edf2f7;
+      --row-bg:        #f7fafc;
+      --xfer-border:   #4299e1;
+      --plus:          #276749;
+      --minus:         #c53030;
+      --shadow:        rgba(0,0,0,0.08);
+      --editing-bg:    #fffff0;
+      --banner-bg:     #fefcbf;
+      --banner-border: #f6e05e;
+      --banner-text:   #744210;
+    }
+
+    [data-theme="dark"] {
+      --bg:            #1a202c;
+      --card:          #2d3748;
+      --text:          #f7fafc;
+      --text-sub:      #a0aec0;
+      --text-muted:    #8fa3b8;
+      --border:        #4a5568;
+      --input-bg:      #1a202c;
+      --tag-bg:        #2a4365;
+      --tag-border:    #2b6cb0;
+      --tag-text:      #90cdf4;
+      --primary:       #3182ce;
+      --primary-text:  #ffffff;
+      --btn-add-bg:    #2a4365;
+      --btn-add-text:  #90cdf4;
+      --btn-del-bg:    #742a2a;
+      --btn-del-text:  #fc8181;
+      --btn-edit-bg:   #5f370e;
+      --btn-edit-text: #fef3c7;
+      --btn-rst-bg:    #4a5568;
+      --btn-rst-text:  #e2e8f0;
+      --tbl-head:      #4a5568;
+      --row-bg:        #1a202c;
+      --xfer-border:   #63b3ed;
+      --plus:          #68d391;
+      --minus:         #fc8181;
+      --shadow:        rgba(0,0,0,0.35);
+      --editing-bg:    #5f370e;
+      --banner-bg:     #5f370e;
+      --banner-border: #975a16;
+      --banner-text:   #fef3c7;
+    }
+
+    /* ===== リセット ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+      transition: background 0.25s, color 0.25s;
+    }
+
+    .container { max-width: 640px; margin: 0 auto; }
+
+    /* ===== ヘッダー ===== */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.03em;
+    }
+
+    .dark-btn {
+      cursor: pointer;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 4px var(--shadow);
+      transition: background 0.25s, border-color 0.25s;
+    }
+
+    /* ===== 復元バナー ===== */
+    .restore-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-size: 0.88rem;
+      color: var(--text-sub);
+    }
+
+    .restore-banner.show { display: flex; }
+    .restore-banner .btn-group { display: flex; gap: 6px; }
+
+    /* ===== カード ===== */
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px var(--shadow);
+      transition: background 0.25s;
+    }
+
+    .card-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text-sub);
+      letter-spacing: 0.02em;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 14px 0;
+    }
+
+    /* ===== フォーム ===== */
+    .row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    input, select {
+      flex: 1;
+      min-width: 0;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: var(--text);
+      background: var(--input-bg);
+      transition: border-color 0.2s, background 0.25s;
+      -webkit-appearance: none;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: var(--card);
+    }
+
+    input::placeholder { color: var(--text-muted); }
+
+    /* ===== ボタン共通 ===== */
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 10px 16px;
+      transition: filter 0.15s, transform 0.1s, background 0.25s, opacity 0.2s;
+      white-space: nowrap;
+      line-height: 1.2;
+    }
+
+    button:active:not(:disabled) { transform: scale(0.97); }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-add { background: var(--btn-add-bg); color: var(--btn-add-text); }
+    .btn-add:hover:not(:disabled) { filter: brightness(0.94); }
+
+    .btn-del  { background: var(--btn-del-bg);  color: var(--btn-del-text);  padding: 7px 10px; font-size: 0.95rem; }
+    .btn-edit { background: var(--btn-edit-bg); color: var(--btn-edit-text); padding: 7px 10px; font-size: 0.78rem; }
+
+    .btn-calc {
+      width: 100%;
+      padding: 14px;
+      font-size: 1.05rem;
+      background: var(--primary);
+      color: var(--primary-text);
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(43,108,176,0.35);
+    }
+
+    .btn-calc:hover:not(:disabled) { filter: brightness(1.08); }
+
+    .btn-rst {
+      width: 100%;
+      padding: 10px;
+      font-size: 0.88rem;
+      background: var(--btn-rst-bg);
+      color: var(--btn-rst-text);
+      margin-top: 8px;
+    }
+
+    .btn-rst:hover { filter: brightness(0.95); }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      color: var(--text-sub);
+      border-radius: 6px;
+    }
+
+    .btn-sm:hover { background: var(--tbl-head); }
+
+    /* コピーボタン */
+    .btn-copy         { background: #e6fffa; color: #234e52; flex: 0 0 auto; padding: 10px 14px; }
+    [data-theme="dark"] .btn-copy { background: #234e52; color: #b2f5ea; }
+
+    /* 共有トグルボタン */
+    .btn-share-toggle { flex: 1; background: var(--btn-add-bg); color: var(--btn-add-text); }
+
+    /* 共有パネル（折りたたみ） */
+    .share-panel {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 10px;
+      background: var(--row-bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .share-panel.open { display: flex; }
+
+    /* パネル内の各共有ボタン */
+    .btn-share-item {
+      width: 100%;
+      text-align: left;
+      padding: 10px 14px;
+      border-radius: 7px;
+    }
+    .btn-line-item    { background: #d4edda; color: #155724; }
+    .btn-discord-item { background: #ebf0ff; color: #3c4bab; }
+    [data-theme="dark"] .btn-line-item    { background: #1c4532; color: #9ae6b4; }
+    [data-theme="dark"] .btn-discord-item { background: #2a3670; color: #bec8ff; }
+
+    /* Discord URL 入力エリア（折りたたみ） */
+    .discord-url-area {
+      display: none;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .discord-url-area.open { display: flex; }
+    .discord-url-area input { font-size: 0.82rem; padding: 8px 10px; }
+
+    .btn-discord-send { background: #3c4bab; color: #fff; flex: 0 0 auto; padding: 10px 14px; }
+    [data-theme="dark"] .btn-discord-send { background: #4a5bcc; }
+
+    /* テーブル横スクロール（モバイル対応） */
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+    /* ===== シェア行 ===== */
+    .share-row { display: flex; gap: 8px; margin-top: 12px; }
+
+    /* ===== メンバータグ ===== */
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 32px;
+      margin-top: 8px;
+    }
+
+    .tag {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      border: 1.5px solid var(--tag-border);
+      border-radius: 20px;
+      padding: 4px 12px 4px 14px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: background 0.25s;
+    }
+
+    .tag .x {
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1;
+      transition: color 0.1s;
+    }
+
+    .tag .x:hover { color: var(--btn-del-text); }
+
+    /* ===== 編集バナー ===== */
+    .edit-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--banner-bg);
+      border: 1px solid var(--banner-border);
+      border-radius: 7px;
+      padding: 7px 12px;
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+      color: var(--banner-text);
+      transition: background 0.25s;
+    }
+
+    .edit-banner.show { display: flex; }
+
+    /* ===== 支払いリスト ===== */
+    .payment-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .payment-item:last-child { border-bottom: none; }
+
+    .payment-item.editing {
+      background: var(--editing-bg);
+      border-radius: 7px;
+      padding: 8px;
+      margin: 0 -4px;
+    }
+
+    .payment-item .payer  { font-weight: 600; min-width: 56px; }
+    .payment-item .amount { color: var(--plus); font-weight: 700; }
+    .payment-item .desc   { color: var(--text-sub); font-size: 0.83rem; flex: 1; min-width: 50px; }
+
+    /* ===== 結果エリア ===== */
+    #result { display: none; }
+
+    .balance-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .balance-table th {
+      background: var(--tbl-head);
+      padding: 8px 10px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+
+    .balance-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+    .balance-table tr:last-child td { border-bottom: none; }
+
+    .plus  { color: var(--plus);  font-weight: 700; }
+    .minus { color: var(--minus); font-weight: 700; }
+    .zero  { color: var(--text-muted); }
+
+    /* ===== 端数注記 ===== */
+    .rounding-note {
+      font-size: 0.82rem;
+      color: var(--text-sub);
+      margin-top: 8px;
+      padding: 7px 10px;
+      background: var(--row-bg);
+      border-radius: 6px;
+      border-left: 3px solid var(--xfer-border);
+    }
+
+    /* ===== 精算ステップ ===== */
+    .transfer-list { list-style: none; }
+
+    .transfer-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      background: var(--row-bg);
+      border-radius: 8px;
+      border-left: 3px solid var(--xfer-border);
+      font-size: 0.93rem;
+    }
+
+    .transfer-list li .arrow { color: var(--xfer-border); font-size: 1.1rem; }
+    .transfer-list li .amt   { font-weight: 700; color: var(--tag-text); margin-left: auto; }
+
+    .no-transfer {
+      text-align: center;
+      padding: 16px;
+      color: var(--plus);
+      font-weight: 600;
+    }
+
+    /* ===== エラーメッセージ ===== */
+    .error-msg {
+      display: none;
+      color: var(--minus);
+      font-size: 0.84rem;
+      margin-top: 4px;
+    }
+
+    /* ===== トースト ===== */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(90px);
+      background: #2d3748;
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 22px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.28);
+      z-index: 9999;
+      white-space: nowrap;
+      pointer-events: none;
+      transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ===== ユーティリティ ===== */
+    .mt8  { margin-top: 8px; }
+    .mt12 { margin-top: 12px; }
+    .center { text-align: center; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ヘッダー -->
+  <div class="header">
+    <h1>💴 割り勘精算計算機</h1>
+    <button class="dark-btn" id="darkBtn" onclick="toggleDark()" title="ダーク／ライト切替">🌙</button>
+  </div>
+
+  <!-- localStorage 復元バナー -->
+  <div class="restore-banner" id="restoreBanner">
+    <span>💾 前回の入力内容が保存されています</span>
+    <div class="btn-group">
+      <button class="btn-sm" onclick="applyRestore()">復元する</button>
+      <button class="btn-sm" onclick="dismissRestore()">破棄</button>
+    </div>
+  </div>
+
+  <!-- ① メンバーカード -->
+  <div class="card">
+    <div class="card-title">👥 メンバー</div>
+    <div class="row">
+      <input type="text" id="memberInput" placeholder="名前を入力（例: 田中）" maxlength="20">
+      <button class="btn-add" onclick="addMember()">追加</button>
+    </div>
+    <p class="error-msg" id="memberError"></p>
+    <div class="tag-list" id="memberList"></div>
+  </div>
+
+  <!-- ② 支払い入力カード -->
+  <div class="card">
+    <div class="card-title">💳 支払い入力</div>
+
+    <!-- 編集中バナー -->
+    <div class="edit-banner" id="editBanner">
+      <span>✏️ 支払いを編集中...</span>
+      <button class="btn-sm" onclick="cancelEdit()">キャンセル</button>
+    </div>
+
+    <div class="row">
+      <select id="payerSelect">
+        <option value="">支払い者を選択</option>
+      </select>
+      <input type="number" id="amountInput" placeholder="金額（円）" min="1" step="1" inputmode="numeric">
+    </div>
+    <div class="row">
+      <input type="text" id="descInput" placeholder="内容（例: 夕食、交通費）" maxlength="30">
+      <button class="btn-add" id="paySubmitBtn" onclick="submitPayment()">追加</button>
+    </div>
+    <p class="error-msg" id="paymentError"></p>
+    <div id="paymentList" class="mt8"></div>
+  </div>
+
+  <!-- ③ 計算ボタン -->
+  <button class="btn-calc" id="calcBtn" onclick="calculate()" disabled>精算を計算する</button>
+  <p class="error-msg center" id="calcError" style="margin-top:6px;"></p>
+
+  <!-- ④ 結果カード -->
+  <div class="card mt12" id="result">
+    <div class="card-title">📊 収支サマリー</div>
+    <div class="table-wrap">
+      <table class="balance-table">
+        <thead>
+          <tr>
+            <th>名前</th>
+            <th>支払い合計</th>
+            <th>負担額</th>
+            <th>収支</th>
+          </tr>
+        </thead>
+        <tbody id="balanceBody"></tbody>
+      </table>
+    </div>
+    <p class="rounding-note" id="roundingNote" style="display:none;"></p>
+
+    <hr class="divider">
+
+    <div class="card-title">🔁 最小送金プラン</div>
+    <div id="transferResult"></div>
+
+    <!-- コピー / 共有 -->
+    <div class="share-row">
+      <button class="btn-copy" onclick="copyResult()">📋 コピー</button>
+      <button class="btn-share-toggle" id="shareToggleBtn" onclick="toggleSharePanel()">📤 共有する ▾</button>
+    </div>
+    <!-- 共有パネル（LINEまたはDiscordを選択） -->
+    <div class="share-panel" id="sharePanel">
+      <button class="btn-share-item btn-line-item" onclick="shareToLine()">💬 LINEで送る</button>
+      <button class="btn-share-item btn-discord-item" id="discordToggleBtn" onclick="toggleDiscordInput()">🎮 Discordへ送信 ▾</button>
+      <!-- Discord URL入力（Discordボタン押下で展開） -->
+      <div class="discord-url-area" id="discordUrlArea">
+        <input type="url" id="discordUrl" placeholder="Discord Webhook URL" spellcheck="false" autocomplete="off">
+        <button class="btn-sm" onclick="saveDiscordUrl()" title="このURLをデフォルトとして保存">💾 保存</button>
+        <button class="btn-discord-send" id="discordSendBtn" onclick="sendToDiscord()">送信</button>
+      </div>
+    </div>
+
+    <button class="btn-rst" onclick="resetAll()">🔄 リセット</button>
+  </div>
+
+</div>
+
+<!-- トースト通知 -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ===== 定数 =====
+  // Discord Webhook URL の固定デフォルト値（使用するURLに書き換えてください）
+  const DEFAULT_DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1497162091423862904/DZC5Kg2cEF0zsC5ywFhB6Xy8KZKaMvmsuqVeXN7et-ni_IehZFPGjN-vSU0zg2othnJa';
+
+  // ===== 状態 =====
+  const state = {
+    members:   [],
+    payments:  [],
+    editIndex: -1
+  };
+
+  let pendingSaved = null;
+
+  // ===== ユーティリティ =====
+  const $ = id => document.getElementById(id);
+
+  function showError(id, msg) {
+    const el = $(id);
+    el.textContent = msg;
+    el.style.display = 'block';
+    clearTimeout(el._t);
+    el._t = setTimeout(() => { el.style.display = 'none'; }, 3500);
+  }
+
+  let _toastTimer;
+  function showToast(msg, ms = 2200) {
+    clearTimeout(_toastTimer);
+    const el = $('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    _toastTimer = setTimeout(() => el.classList.remove('show'), ms);
+  }
+
+  function fmt(n) {
+    return '¥' + Math.abs(n).toLocaleString('ja-JP');
+  }
+
+  function fmtSigned(n) {
+    const sign = n > 0 ? '+' : n < 0 ? '-' : '';
+    return sign + '¥' + Math.abs(n).toLocaleString('ja-JP');
+  }
+
+  function esc(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // ===== localStorage 永続化 =====
+  const STORE_KEY = 'warikan_v2';
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({
+        members:  state.members,
+        payments: state.payments
+      }));
+    } catch(e) {}
+  }
+
+  function initFromStorage() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      const hasData = (data.members  && data.members.length  > 0) ||
+                      (data.payments && data.payments.length > 0);
+      if (hasData) {
+        pendingSaved = data;
+        $('restoreBanner').classList.add('show');
+      }
+    } catch(e) {
+      localStorage.removeItem(STORE_KEY);
+    }
+  }
+
+  function applyRestore() {
+    if (!pendingSaved) return;
+    state.members  = pendingSaved.members  || [];
+    state.payments = pendingSaved.payments || [];
+    pendingSaved = null;
+    $('restoreBanner').classList.remove('show');
+    renderAll();
+    showToast('✅ 前回の入力内容を復元しました');
+  }
+
+  function dismissRestore() {
+    pendingSaved = null;
+    $('restoreBanner').classList.remove('show');
+    localStorage.removeItem(STORE_KEY);
+  }
+
+  // ===== ダークモード =====
+  function initTheme() {
+    if (localStorage.getItem('warikan_dark') === 'true') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      $('darkBtn').textContent = '☀️';
+    }
+  }
+
+  function toggleDark() {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (dark) {
+      document.documentElement.removeAttribute('data-theme');
+      $('darkBtn').textContent = '🌙';
+      localStorage.setItem('warikan_dark', 'false');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      $('darkBtn').textContent = '☀️';
+      localStorage.setItem('warikan_dark', 'true');
+    }
+  }
+
+  // ===== 計算ボタン有効化 =====
+  function updateCalcBtn() {
+    const ok = state.members.length >= 2 && state.payments.length >= 1;
+    const btn = $('calcBtn');
+    btn.disabled = !ok;
+    btn.title = ok ? '' :
+      state.members.length < 2 ? 'メンバーを2人以上追加してください'
+                                : '支払い情報を1件以上入力してください';
+  }
+
+  // ===== メンバー =====
+  function addMember() {
+    const input = $('memberInput');
+    const name  = input.value.trim();
+
+    if (!name)                        { showError('memberError', '名前を入力してください'); return; }
+    if (state.members.includes(name)) { showError('memberError', `「${name}」は既に追加されています`); return; }
+    if (state.members.length >= 20)   { showError('memberError', 'メンバーは最大20人です'); return; }
+
+    state.members.push(name);
+    input.value = '';
+    renderMembers();
+    syncPayerSelect();
+    updateCalcBtn();
+    saveState();
+  }
+
+  function removeMember(name) {
+    const payCount = state.payments.filter(p => p.payer === name).length;
+    const msg = payCount > 0
+      ? `「${name}」を削除します。\nこのメンバーの支払い記録（${payCount}件）も削除されます。よろしいですか？`
+      : `「${name}」を削除しますか？`;
+    if (!confirm(msg)) return;
+
+    state.payments = state.payments.filter(p => p.payer !== name);
+    state.members  = state.members.filter(m => m !== name);
+    cancelEdit();
+    renderAll();
+    saveState();
+    $('result').style.display = 'none';
+  }
+
+  function renderMembers() {
+    const list = $('memberList');
+    if (state.members.length === 0) {
+      list.innerHTML = '<span style="color:var(--text-muted);font-size:0.85rem;">メンバーがいません</span>';
+      return;
+    }
+    list.innerHTML = state.members.map(name => `
+      <div class="tag">
+        ${esc(name)}
+        <span class="x" onclick="removeMember('${esc(name)}')" title="削除">×</span>
+      </div>
+    `).join('');
+  }
+
+  function syncPayerSelect() {
+    const sel = $('payerSelect');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">支払い者を選択</option>' +
+      state.members.map(m =>
+        `<option value="${esc(m)}"${m === cur ? ' selected' : ''}>${esc(m)}</option>`
+      ).join('');
+  }
+
+  // ===== 支払い =====
+  function submitPayment() {
+    const payer  = $('payerSelect').value;
+    const rawVal = $('amountInput').value;
+    const amount = parseInt(rawVal, 10);
+    const desc   = $('descInput').value.trim();
+
+    if (!payer)                       { showError('paymentError', '支払い者を選択してください'); return; }
+    if (rawVal === '')                { showError('paymentError', '金額を入力してください'); return; }
+    if (isNaN(amount) || amount < 1) { showError('paymentError', '1円以上の整数を入力してください'); return; }
+    if (amount > 999_999_999)        { showError('paymentError', '金額が大きすぎます（上限9桁）'); return; }
+
+    const entry = { payer, amount, desc: desc || '（記録なし）' };
+
+    if (state.editIndex >= 0) {
+      state.payments[state.editIndex] = entry;
+      cancelEdit();
+      showToast('✅ 支払い情報を更新しました');
+    } else {
+      state.payments.push(entry);
+    }
+
+    $('amountInput').value = '';
+    $('descInput').value   = '';
+    $('payerSelect').value = '';
+    renderPayments();
+    updateCalcBtn();
+    saveState();
+    $('result').style.display = 'none';
+  }
+
+  function startEdit(index) {
+    const p = state.payments[index];
+    state.editIndex = index;
+    $('payerSelect').value        = p.payer;
+    $('amountInput').value        = p.amount;
+    $('descInput').value          = p.desc === '（記録なし）' ? '' : p.desc;
+    $('paySubmitBtn').textContent = '更新';
+    $('editBanner').classList.add('show');
+    renderPayments();
+    $('payerSelect').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    $('payerSelect').focus();
+  }
+
+  function cancelEdit() {
+    if (state.editIndex < 0) return;
+    state.editIndex = -1;
+    $('payerSelect').value        = '';
+    $('amountInput').value        = '';
+    $('descInput').value          = '';
+    $('paySubmitBtn').textContent = '追加';
+    $('editBanner').classList.remove('show');
+    renderPayments();
+  }
+
+  function removePayment(index) {
+    if (state.editIndex === index) cancelEdit();
+    state.payments.splice(index, 1);
+    if (state.editIndex > index) state.editIndex--;
+    renderPayments();
+    updateCalcBtn();
+    saveState();
+    $('result').style.display = 'none';
+  }
+
+  function renderPayments() {
+    const list = $('paymentList');
+    if (state.payments.length === 0) {
+      list.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;">支払い記録がありません</p>';
+      return;
+    }
+    list.innerHTML = state.payments.map((p, i) => `
+      <div class="payment-item${state.editIndex === i ? ' editing' : ''}">
+        <span class="payer">${esc(p.payer)}</span>
+        <span class="amount">${fmt(p.amount)}</span>
+        <span class="desc">${esc(p.desc)}</span>
+        <button class="btn-edit" onclick="startEdit(${i})" title="編集">✏️</button>
+        <button class="btn-del"  onclick="removePayment(${i})" title="削除">×</button>
+      </div>
+    `).join('');
+  }
+
+  // ===== 精算計算 =====
+  function calculate() {
+    const n     = state.members.length;
+    const total = state.payments.reduce((s, p) => s + p.amount, 0);
+
+    // 切り捨て除算: 端数は誰にも加算しない
+    const floorShare = Math.floor(total / n);
+    const remainder  = total - floorShare * n;
+
+    const paid = {};
+    state.members.forEach(m => { paid[m] = 0; });
+    state.payments.forEach(p => { paid[p.payer] += p.amount; });
+
+    const balance = {};
+    state.members.forEach(m => { balance[m] = paid[m] - floorShare; });
+
+    // 収支サマリー
+    $('balanceBody').innerHTML = state.members.map(m => {
+      const b   = balance[m];
+      const cls = b > 0 ? 'plus' : b < 0 ? 'minus' : 'zero';
+      return `
+        <tr>
+          <td>${esc(m)}</td>
+          <td>${fmt(paid[m])}</td>
+          <td>${fmt(floorShare)}</td>
+          <td class="${cls}">${fmtSigned(b)}</td>
+        </tr>
+      `;
+    }).join('');
+
+    const noteEl = $('roundingNote');
+    if (remainder > 0) {
+      noteEl.textContent = `※合計¥${total.toLocaleString('ja-JP')}の端数¥${remainder}は切り捨てています`;
+      noteEl.style.display = 'block';
+    } else {
+      noteEl.style.display = 'none';
+    }
+
+    // Greedy法: 最小送金数で精算
+    const creditors = [];
+    const debtors   = [];
+    state.members.forEach(m => {
+      if (balance[m] > 0) creditors.push({ name: m, amount:  balance[m] });
+      if (balance[m] < 0) debtors.push({   name: m, amount: -balance[m] });
+    });
+    creditors.sort((a, b) => b.amount - a.amount);
+    debtors.sort((a, b)   => b.amount - a.amount);
+
+    const transfers = greedySettle(creditors, debtors);
+
+    const div = $('transferResult');
+    if (transfers.length === 0) {
+      div.innerHTML = '<div class="no-transfer">🎉 精算不要！みんな均等に支払っています</div>';
+    } else {
+      div.innerHTML = `
+        <p style="font-size:0.84rem;color:var(--text-sub);margin-bottom:10px;">
+          合計 <strong>${transfers.length} 回</strong> の送金で精算できます
+        </p>
+        <ul class="transfer-list">
+          ${transfers.map(t => `
+            <li>
+              <span>${esc(t.from)}</span>
+              <span class="arrow">→</span>
+              <span>${esc(t.to)}</span>
+              <span class="amt">${fmt(t.amount)}</span>
+            </li>
+          `).join('')}
+        </ul>
+      `;
+    }
+
+    $('result').style.display = 'block';
+    $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /**
+   * Greedy法: 最大の債権者と債務者を順次相殺して最小送金数を実現
+   * 全額が整数なので浮動小数点誤差なし
+   * credits > debits の場合（端数切り捨て時）は残額が自然に吸収される
+   */
+  function greedySettle(creditors, debtors) {
+    const transfers = [];
+    let ci = 0, di = 0;
+
+    while (ci < creditors.length && di < debtors.length) {
+      const cr = creditors[ci];
+      const de = debtors[di];
+      const amount = Math.min(cr.amount, de.amount);
+
+      if (amount > 0) transfers.push({ from: de.name, to: cr.name, amount });
+
+      cr.amount -= amount;
+      de.amount -= amount;
+
+      if (cr.amount === 0) ci++;
+      if (de.amount === 0) di++;
+    }
+
+    return transfers;
+  }
+
+  // ===== 結果テキスト生成（コピー・LINE・Discord 共通） =====
+  function buildResultText() {
+    const items = $('transferResult').querySelectorAll('.transfer-list li');
+    const lines = ['【割り勘精算結果】'];
+
+    if (items.length === 0) {
+      lines.push('精算不要です。全員均等に支払っています。');
+    } else {
+      lines.push(`合計${items.length}回の送金で精算できます。`);
+      lines.push('');
+      items.forEach(li => {
+        const s = li.querySelectorAll('span');
+        lines.push(`${s[0].textContent} → ${s[2].textContent}　${s[3].textContent}`);
+      });
+    }
+
+    lines.push('');
+    lines.push('💰 PayPayで送る: https://paypay.ne.jp/');
+
+    return lines.join('\n');
+  }
+
+  // ===== コピー =====
+  function copyResult() {
+    const text = buildResultText();
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(() => showToast('📋 クリップボードにコピーしました'))
+        .catch(() => fallbackCopy(text));
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    const el = Object.assign(document.createElement('textarea'), {
+      value: text, style: 'position:fixed;left:-9999px;top:-9999px'
+    });
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast('📋 クリップボードにコピーしました');
+  }
+
+  // ===== 共有パネル トグル =====
+  function toggleSharePanel() {
+    const panel = $('sharePanel');
+    const btn   = $('shareToggleBtn');
+    const open  = panel.classList.toggle('open');
+    btn.textContent = open ? '📤 共有する ▴' : '📤 共有する ▾';
+    if (!open) {
+      $('discordUrlArea').classList.remove('open');
+      $('discordToggleBtn').textContent = '🎮 Discordへ送信 ▾';
+    }
+  }
+
+  function toggleDiscordInput() {
+    const area = $('discordUrlArea');
+    const btn  = $('discordToggleBtn');
+    const open = area.classList.toggle('open');
+    btn.textContent = open ? '🎮 Discordへ送信 ▴' : '🎮 Discordへ送信 ▾';
+    if (open) {
+      // localStorageの保存値 → なければ定数デフォルト値で補完
+      if (!$('discordUrl').value) {
+        try {
+          $('discordUrl').value = localStorage.getItem('warikan_discord_url') || DEFAULT_DISCORD_WEBHOOK_URL;
+        } catch(e) {
+          $('discordUrl').value = DEFAULT_DISCORD_WEBHOOK_URL;
+        }
+      }
+      $('discordUrl').focus();
+    }
+  }
+
+  // ===== LINE シェア =====
+  function shareToLine() {
+    const url = 'https://line.me/R/msg/text/?' + encodeURIComponent(buildResultText());
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  // ===== Discord Webhook URL 保存 =====
+  function saveDiscordUrl() {
+    const url = $('discordUrl').value.trim();
+    try { localStorage.setItem('warikan_discord_url', url); } catch(e) {}
+    showToast('💾 Webhook URLを保存しました');
+  }
+
+  // ===== Discord Webhook 送信 =====
+  async function sendToDiscord() {
+    const url = $('discordUrl').value.trim();
+    const btn = $('discordSendBtn');
+
+    if (!url) {
+      showToast('⚠️ Webhook URLを入力してください', 3000);
+      $('discordUrl').focus();
+      return;
+    }
+    if (!/^https:\/\/(discord\.com|discordapp\.com)\/api\/webhooks\//.test(url)) {
+      showToast('⚠️ 有効なDiscord Webhook URLを入力してください', 3500);
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '送信中...';
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: buildResultText() })
+      });
+      showToast(res.ok ? '✅ Discordへ送信しました' : `⚠️ 送信失敗（HTTP ${res.status}）`, 3500);
+    } catch(e) {
+      showToast('⚠️ 送信エラー。Webhook URLを確認してください', 3500);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '送信';
+    }
+  }
+
+  // ===== リセット =====
+  function resetAll() {
+    if (!confirm('すべてのデータを削除してリセットしますか？\nこの操作は取り消せません。')) return;
+    state.members   = [];
+    state.payments  = [];
+    state.editIndex = -1;
+    renderAll();
+    $('result').style.display = 'none';
+    localStorage.removeItem(STORE_KEY);
+    showToast('🔄 リセットしました');
+  }
+
+  // ===== まとめて再描画 =====
+  function renderAll() {
+    renderMembers();
+    renderPayments();
+    syncPayerSelect();
+    updateCalcBtn();
+    $('paySubmitBtn').textContent  = '追加';
+    $('editBanner').classList.remove('show');
+    $('sharePanel').classList.remove('open');
+    $('discordUrlArea').classList.remove('open');
+    $('shareToggleBtn').textContent   = '📤 共有する ▾';
+    $('discordToggleBtn').textContent = '🎮 Discordへ送信 ▾';
+  }
+
+  // ===== キーボード =====
+  $('memberInput').addEventListener('keydown', e => { if (e.key === 'Enter') addMember(); });
+  $('amountInput').addEventListener('keydown', e => { if (e.key === 'Enter') submitPayment(); });
+  $('descInput').addEventListener('keydown',   e => { if (e.key === 'Enter') submitPayment(); });
+
+  $('amountInput').addEventListener('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, '');
+  });
+
+  // ===== 初期化 =====
+  initTheme();
+  initFromStorage();
+  renderAll();
+
+  // ===== Service Worker 登録（PWA） =====
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#2b6cb0"/>
+  <text x="256" y="300"
+        text-anchor="middle"
+        font-family="'Helvetica Neue',Arial,sans-serif"
+        font-size="256" font-weight="700"
+        fill="#ffffff">¥</text>
+  <text x="256" y="400"
+        text-anchor="middle"
+        font-family="'Helvetica Neue',Arial,sans-serif"
+        font-size="60" font-weight="600"
+        fill="rgba(255,255,255,0.72)">割り勘</text>
+</svg>
