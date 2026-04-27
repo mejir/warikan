@@ -338,6 +338,49 @@
     .payment-item .payer  { font-weight: 600; min-width: 56px; }
     .payment-item .amount { color: var(--plus); font-weight: 700; }
     .payment-item .desc   { color: var(--text-sub); font-size: 0.83rem; flex: 1; min-width: 50px; }
+    .payment-item .parts  { flex-basis: 100%; font-size: 0.78rem; color: var(--text-muted); padding-left: 2px; }
+
+    /* ===== 負担者選択エリア ===== */
+    .participants-area {
+      display: none;
+      margin-top: 8px;
+      padding: 10px 12px;
+      background: var(--row-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      transition: background 0.25s;
+    }
+    .participants-area.visible { display: block; }
+    .participants-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+    .check-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .check-label {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.83rem;
+      cursor: pointer;
+      background: var(--card);
+      color: var(--text-sub);
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      user-select: none;
+    }
+    .check-label:hover { border-color: var(--primary); color: var(--text); }
+    .check-label.checked {
+      background: var(--tag-bg);
+      border-color: var(--tag-border);
+      color: var(--tag-text);
+      font-weight: 600;
+    }
 
     /* ===== 結果エリア ===== */
     #result { display: none; }
@@ -483,6 +526,17 @@
       <input type="text" id="descInput" placeholder="内容（例: 夕食、交通費）" maxlength="30">
       <button class="btn-add" id="paySubmitBtn" onclick="submitPayment()">追加</button>
     </div>
+
+    <!-- 負担者選択 -->
+    <div class="participants-area" id="participantsArea">
+      <div class="participants-header">
+        <span>👥 負担者</span>
+        <button type="button" class="btn-sm" onclick="selectAllParticipants()">全員</button>
+        <button type="button" class="btn-sm" onclick="clearParticipants()">クリア</button>
+      </div>
+      <div class="check-list" id="participantsChecks"></div>
+    </div>
+
     <p class="error-msg" id="paymentError"></p>
     <div id="paymentList" class="mt8"></div>
   </div>
@@ -500,7 +554,7 @@
           <tr>
             <th>名前</th>
             <th>支払い合計</th>
-            <th>負担額</th>
+            <th>負担合計</th>
             <th>収支</th>
           </tr>
         </thead>
@@ -665,6 +719,7 @@
     input.value = '';
     renderMembers();
     syncPayerSelect();
+    renderParticipantsChecks();
     updateCalcBtn();
     saveState();
   }
@@ -677,7 +732,10 @@
     if (!confirm(msg)) return;
 
     state.payments = state.payments.filter(p => p.payer !== name);
-    state.members  = state.members.filter(m => m !== name);
+    state.payments.forEach(p => {
+      if (p.participants) p.participants = p.participants.filter(n => n !== name);
+    });
+    state.members = state.members.filter(m => m !== name);
     cancelEdit();
     renderAll();
     saveState();
@@ -707,6 +765,50 @@
       ).join('');
   }
 
+  // ===== 負担者チェックボックス =====
+  function renderParticipantsChecks() {
+    const area = $('participantsArea');
+    const list = $('participantsChecks');
+
+    if (state.members.length === 0) {
+      area.classList.remove('visible');
+      list.innerHTML = '';
+      return;
+    }
+    area.classList.add('visible');
+
+    // 既存のチェック状態を保持（新規メンバーはデフォルトでチェック）
+    const existingNames   = new Set(Array.from(list.querySelectorAll('.check-label')).map(el => el.dataset.name));
+    const existingChecked = new Set(Array.from(list.querySelectorAll('.check-label.checked')).map(el => el.dataset.name));
+
+    list.innerHTML = state.members.map(name => {
+      const checked = existingNames.size === 0 || existingChecked.has(name) || !existingNames.has(name);
+      return `<span class="check-label${checked ? ' checked' : ''}" data-name="${esc(name)}" onclick="toggleParticipant(this)">${esc(name)}</span>`;
+    }).join('');
+  }
+
+  function toggleParticipant(el) { el.classList.toggle('checked'); }
+
+  function selectAllParticipants() {
+    document.querySelectorAll('#participantsChecks .check-label').forEach(el => el.classList.add('checked'));
+  }
+
+  function clearParticipants() {
+    document.querySelectorAll('#participantsChecks .check-label').forEach(el => el.classList.remove('checked'));
+  }
+
+  function getSelectedParticipants() {
+    return Array.from(document.querySelectorAll('#participantsChecks .check-label.checked'))
+      .map(el => el.dataset.name);
+  }
+
+  function setCheckedParticipants(names) {
+    const nameSet = new Set(names);
+    document.querySelectorAll('#participantsChecks .check-label').forEach(el => {
+      el.classList.toggle('checked', nameSet.has(el.dataset.name));
+    });
+  }
+
   // ===== 支払い =====
   function submitPayment() {
     const payer  = $('payerSelect').value;
@@ -719,7 +821,10 @@
     if (isNaN(amount) || amount < 1) { showError('paymentError', '1円以上の整数を入力してください'); return; }
     if (amount > 999_999_999)        { showError('paymentError', '金額が大きすぎます（上限9桁）'); return; }
 
-    const entry = { payer, amount, desc: desc || '（記録なし）' };
+    const participants = getSelectedParticipants();
+    if (participants.length === 0)    { showError('paymentError', '負担者を1人以上選択してください'); return; }
+
+    const entry = { payer, amount, desc: desc || '（記録なし）', participants };
 
     if (state.editIndex >= 0) {
       state.payments[state.editIndex] = entry;
@@ -732,6 +837,7 @@
     $('amountInput').value = '';
     $('descInput').value   = '';
     $('payerSelect').value = '';
+    selectAllParticipants();
     renderPayments();
     updateCalcBtn();
     saveState();
@@ -746,6 +852,9 @@
     $('descInput').value          = p.desc === '（記録なし）' ? '' : p.desc;
     $('paySubmitBtn').textContent = '更新';
     $('editBanner').classList.add('show');
+    // 負担者チェックを復元
+    const saved = p.participants && p.participants.length > 0 ? p.participants : state.members;
+    setCheckedParticipants(saved);
     renderPayments();
     $('payerSelect').scrollIntoView({ behavior: 'smooth', block: 'center' });
     $('payerSelect').focus();
@@ -759,6 +868,7 @@
     $('descInput').value          = '';
     $('paySubmitBtn').textContent = '追加';
     $('editBanner').classList.remove('show');
+    selectAllParticipants();
     renderPayments();
   }
 
@@ -778,32 +888,50 @@
       list.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;">支払い記録がありません</p>';
       return;
     }
-    list.innerHTML = state.payments.map((p, i) => `
-      <div class="payment-item${state.editIndex === i ? ' editing' : ''}">
-        <span class="payer">${esc(p.payer)}</span>
-        <span class="amount">${fmt(p.amount)}</span>
-        <span class="desc">${esc(p.desc)}</span>
-        <button class="btn-edit" onclick="startEdit(${i})" title="編集">✏️</button>
-        <button class="btn-del"  onclick="removePayment(${i})" title="削除">×</button>
-      </div>
-    `).join('');
+    list.innerHTML = state.payments.map((p, i) => {
+      const parts = (p.participants && p.participants.length > 0) ? p.participants : state.members;
+      const partsLabel = parts.length === state.members.length ? '👥 全員' : '👥 ' + parts.map(esc).join('・');
+      return `
+        <div class="payment-item${state.editIndex === i ? ' editing' : ''}">
+          <span class="payer">${esc(p.payer)}</span>
+          <span class="amount">${fmt(p.amount)}</span>
+          <span class="desc">${esc(p.desc)}</span>
+          <button class="btn-edit" onclick="startEdit(${i})" title="編集">✏️</button>
+          <button class="btn-del"  onclick="removePayment(${i})" title="削除">×</button>
+          <span class="parts">${partsLabel}</span>
+        </div>
+      `;
+    }).join('');
   }
 
   // ===== 精算計算 =====
   function calculate() {
-    const n     = state.members.length;
-    const total = state.payments.reduce((s, p) => s + p.amount, 0);
-
-    // 切り捨て除算: 端数は誰にも加算しない
-    const floorShare = Math.floor(total / n);
-    const remainder  = total - floorShare * n;
-
+    // 支払い合計（支払者別）
     const paid = {};
     state.members.forEach(m => { paid[m] = 0; });
     state.payments.forEach(p => { paid[p.payer] += p.amount; });
 
+    // 負担合計（participants 別の均等割り、端数切り捨て）
+    const burden = {};
+    state.members.forEach(m => { burden[m] = 0; });
+    let hasRounding = false;
+
+    state.payments.forEach(p => {
+      // participants が未設定の場合は全員（旧データ互換）
+      const parts = (p.participants && p.participants.length > 0)
+        ? p.participants.filter(m => state.members.includes(m))
+        : state.members;
+      if (parts.length === 0) return;
+
+      const share = Math.floor(p.amount / parts.length);
+      const rem   = p.amount - share * parts.length;
+      if (rem > 0) hasRounding = true;
+      parts.forEach(m => { burden[m] += share; });
+    });
+
+    // 収支 = 支払った − 負担した
     const balance = {};
-    state.members.forEach(m => { balance[m] = paid[m] - floorShare; });
+    state.members.forEach(m => { balance[m] = paid[m] - burden[m]; });
 
     // 収支サマリー
     $('balanceBody').innerHTML = state.members.map(m => {
@@ -813,15 +941,15 @@
         <tr>
           <td>${esc(m)}</td>
           <td>${fmt(paid[m])}</td>
-          <td>${fmt(floorShare)}</td>
+          <td>${fmt(burden[m])}</td>
           <td class="${cls}">${fmtSigned(b)}</td>
         </tr>
       `;
     }).join('');
 
     const noteEl = $('roundingNote');
-    if (remainder > 0) {
-      noteEl.textContent = `※合計¥${total.toLocaleString('ja-JP')}の端数¥${remainder}は切り捨てています`;
+    if (hasRounding) {
+      noteEl.textContent = '※各支払いの端数は切り捨てています';
       noteEl.style.display = 'block';
     } else {
       noteEl.style.display = 'none';
@@ -860,7 +988,7 @@
       `;
     }
 
-    state.lastCalc = { floorShare, paid, balance, transfers };
+    state.lastCalc = { paid, burden, balance, transfers };
 
     $('result').style.display = 'block';
     $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -969,6 +1097,8 @@
     renderMembers();
     renderPayments();
     syncPayerSelect();
+    renderParticipantsChecks();
+    selectAllParticipants();
     updateCalcBtn();
     $('paySubmitBtn').textContent = '追加';
     $('editBanner').classList.remove('show');
