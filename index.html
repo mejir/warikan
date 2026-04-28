@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
   <title>割り勘精算計算機</title>
 
   <!-- PWA -->
@@ -805,7 +805,7 @@
       payer:     p.payer,
       amount:    p.amount,
       desc:      p.desc      || '（記録なし）',
-      splits:    computeEqualSplits(p.amount, parts),
+      splits:    computeEqualSplits(p.amount, parts, p.payer),
       createdAt: p.createdAt || Date.now()
     };
   }
@@ -923,23 +923,30 @@
     $('tabCustom').classList.toggle('active', mode === 'custom');
     $('equalArea').style.display  = mode === 'equal'  ? '' : 'none';
     $('customArea').style.display = mode === 'custom' ? '' : 'none';
-    if (mode === 'equal')  { renderParticipantsChecks(); updateEqualPreview(); }
+    if (mode === 'equal')  {
+      renderParticipantsChecks();
+      updateEqualPreview();
+      $('paySubmitBtn').disabled = false; // カスタムモードの非活性を解除
+    }
     if (mode === 'custom') { renderCustomSplitInputs(); }
   }
 
   // ===== 均等割りモード =====
 
   /**
-   * 均等割り: 端数は最後の参加者に集約（決定的ルール）
+   * 均等割り: 端数は支払者負担（支払者が参加者にいない場合は最後の参加者）
    */
-  function computeEqualSplits(amount, participants) {
+  function computeEqualSplits(amount, participants, payer = null) {
     if (!participants || participants.length === 0) return [];
-    const n     = participants.length;
-    const share = Math.floor(amount / n);
-    const rem   = amount - share * n;
-    return participants.map((userId, i) => ({
+    const n           = participants.length;
+    const share       = Math.floor(amount / n);
+    const rem         = amount - share * n;
+    const remReceiver = (payer && participants.includes(payer))
+      ? payer
+      : participants[participants.length - 1];
+    return participants.map(userId => ({
       userId,
-      amount: i === n - 1 ? share + rem : share
+      amount: rem > 0 && userId === remReceiver ? share + rem : share
     }));
   }
 
@@ -998,8 +1005,10 @@
     const rem   = amount - share * participants.length;
 
     if (rem > 0) {
-      const last = participants[participants.length - 1];
-      preview.textContent = `1人あたり ${fmt(share)} ／ ${esc(last)} のみ +¥${rem}（端数）`;
+      const payer       = $('payerSelect').value;
+      const remReceiver = (payer && participants.includes(payer))
+        ? payer : participants[participants.length - 1];
+      preview.textContent = `1人あたり ${fmt(share)} ／ ${esc(remReceiver)}（支払者）のみ +¥${rem}（端数）`;
     } else {
       preview.textContent = `1人あたり ${fmt(share)}`;
     }
@@ -1020,7 +1029,7 @@
       });
     }
 
-    const splits = computeEqualSplits(amount, state.members);
+    const splits = computeEqualSplits(amount, state.members, $('payerSelect').value || null);
 
     area.innerHTML = splits.map(s => {
       const val = preserveValues && initialValues[s.userId] !== undefined
@@ -1045,15 +1054,20 @@
     const summed = Array.from(inputs).reduce((s, el) => s + (parseInt(el.value, 10) || 0), 0);
     const diff   = amount - summed;
     const el     = $('splitRemainingText');
+    const btn    = $('paySubmitBtn');
 
     if (diff === 0 && amount > 0) {
-      el.innerHTML = `<span class="split-ok">✓ 合計 ${fmt(amount)}</span>`;
+      el.innerHTML  = `<span class="split-ok">✓ 合計 ${fmt(amount)}</span>`;
+      btn.disabled  = false;
     } else if (diff > 0) {
-      el.innerHTML = `<span class="split-err">残 ${fmt(diff)}</span>`;
+      el.innerHTML  = `<span class="split-err">残り ${fmt(diff)}</span>`;
+      btn.disabled  = true;
     } else if (diff < 0) {
-      el.innerHTML = `<span class="split-err">超過 ${fmt(Math.abs(diff))}</span>`;
+      el.innerHTML  = `<span class="split-err">超過 ${fmt(Math.abs(diff))}</span>`;
+      btn.disabled  = true;
     } else {
-      el.innerHTML = '';
+      el.innerHTML  = '';
+      btn.disabled  = true;
     }
   }
 
@@ -1067,7 +1081,7 @@
 
     if (splitMode === 'equal') {
       const participants = getSelectedParticipants();
-      return computeEqualSplits(amount, participants);
+      return computeEqualSplits(amount, participants, $('payerSelect').value || null);
     }
 
     // custom: 0円の人は除外
@@ -1148,7 +1162,7 @@
 
     // 均等割りかどうか判定
     const participants = splits.map(s => s.userId);
-    const equalSplits  = computeEqualSplits(p.amount, participants);
+    const equalSplits  = computeEqualSplits(p.amount, participants, p.payer);
     const isEqual = splits.length === equalSplits.length &&
       splits.every((s, i) => s.userId === equalSplits[i].userId && s.amount === equalSplits[i].amount);
 
@@ -1213,7 +1227,7 @@
       }
       // 均等かカスタムか
       const participants = splits.map(s => s.userId);
-      const equalSplits  = computeEqualSplits(p.amount, participants);
+      const equalSplits  = computeEqualSplits(p.amount, participants, p.payer);
       const isEqual = splits.length > 0 && splits.every((s, i) =>
         s.userId === (equalSplits[i] && equalSplits[i].userId) &&
         s.amount === (equalSplits[i] && equalSplits[i].amount)
