@@ -13,81 +13,88 @@
   <style>
     /* ===== CSS変数（ライト／ダークモード） ===== */
     :root {
-      --bg:            #f0f4f8;
+      --bg:            #f2f2f7;
       --card:          #ffffff;
-      --text:          #2d3748;
-      --text-sub:      #718096;
-      --text-muted:    #a0aec0;
-      --border:        #cbd5e0;
-      --input-bg:      #f7fafc;
-      --tag-bg:        #ebf8ff;
-      --tag-border:    #bee3f8;
-      --tag-text:      #2b6cb0;
-      --primary:       #2b6cb0;
+      --text:          #1c1c1e;
+      --text-sub:      #6c6c70;
+      --text-muted:    #aeaeb2;
+      --border:        #d1d1d6;
+      --input-bg:      #f2f2f7;
+      --tag-bg:        #e8f0fe;
+      --tag-border:    #c5d8f9;
+      --tag-text:      #1a56b0;
+      --primary:       #007aff;
       --primary-text:  #ffffff;
-      --btn-add-bg:    #ebf8ff;
-      --btn-add-text:  #2b6cb0;
-      --btn-del-bg:    #fff5f5;
-      --btn-del-text:  #c53030;
-      --btn-edit-bg:   #fefcbf;
-      --btn-edit-text: #744210;
-      --btn-rst-bg:    #e2e8f0;
-      --btn-rst-text:  #718096;
-      --tbl-head:      #edf2f7;
-      --row-bg:        #f7fafc;
-      --xfer-border:   #4299e1;
-      --plus:          #276749;
-      --minus:         #c53030;
-      --shadow:        rgba(0,0,0,0.08);
-      --editing-bg:    #fffff0;
-      --banner-bg:     #fefcbf;
-      --banner-border: #f6e05e;
-      --banner-text:   #744210;
+      --btn-add-bg:    #e8f0fe;
+      --btn-add-text:  #1a56b0;
+      --btn-del-bg:    #ffeef0;
+      --btn-del-text:  #d70015;
+      --btn-edit-bg:   #fff9e6;
+      --btn-edit-text: #7d5c00;
+      --btn-rst-bg:    #e5e5ea;
+      --btn-rst-text:  #6c6c70;
+      --tbl-head:      #f2f2f7;
+      --row-bg:        #f8f8fb;
+      --xfer-border:   #007aff;
+      --plus:          #248a3d;
+      --minus:         #d70015;
+      --shadow:        rgba(0,0,0,0.07);
+      --shadow-card:   rgba(0,0,0,0.06);
+      --editing-bg:    #fffbf0;
+      --banner-bg:     #fff9e6;
+      --banner-border: #ffe08a;
+      --banner-text:   #7d5c00;
+      --split-ok:      #248a3d;
+      --split-err:     #d70015;
     }
 
     [data-theme="dark"] {
-      --bg:            #1a202c;
-      --card:          #2d3748;
-      --text:          #f7fafc;
-      --text-sub:      #a0aec0;
-      --text-muted:    #8fa3b8;
-      --border:        #4a5568;
-      --input-bg:      #1a202c;
-      --tag-bg:        #2a4365;
-      --tag-border:    #2b6cb0;
-      --tag-text:      #90cdf4;
-      --primary:       #3182ce;
+      --bg:            #1c1c1e;
+      --card:          #2c2c2e;
+      --text:          #f5f5f7;
+      --text-sub:      #98989d;
+      --text-muted:    #636366;
+      --border:        #38383a;
+      --input-bg:      #1c1c1e;
+      --tag-bg:        #1a3a6b;
+      --tag-border:    #1e4d8c;
+      --tag-text:      #5aabff;
+      --primary:       #0a84ff;
       --primary-text:  #ffffff;
-      --btn-add-bg:    #2a4365;
-      --btn-add-text:  #90cdf4;
-      --btn-del-bg:    #742a2a;
-      --btn-del-text:  #fc8181;
-      --btn-edit-bg:   #5f370e;
-      --btn-edit-text: #fef3c7;
-      --btn-rst-bg:    #4a5568;
-      --btn-rst-text:  #e2e8f0;
-      --tbl-head:      #4a5568;
-      --row-bg:        #1a202c;
-      --xfer-border:   #63b3ed;
-      --plus:          #68d391;
-      --minus:         #fc8181;
-      --shadow:        rgba(0,0,0,0.35);
-      --editing-bg:    #5f370e;
-      --banner-bg:     #5f370e;
-      --banner-border: #975a16;
-      --banner-text:   #fef3c7;
+      --btn-add-bg:    #1a3a6b;
+      --btn-add-text:  #5aabff;
+      --btn-del-bg:    #4a0a10;
+      --btn-del-text:  #ff453a;
+      --btn-edit-bg:   #3d2e00;
+      --btn-edit-text: #ffd60a;
+      --btn-rst-bg:    #38383a;
+      --btn-rst-text:  #ebebf5;
+      --tbl-head:      #38383a;
+      --row-bg:        #1c1c1e;
+      --xfer-border:   #0a84ff;
+      --plus:          #30d158;
+      --minus:         #ff453a;
+      --shadow:        rgba(0,0,0,0.4);
+      --shadow-card:   rgba(0,0,0,0.3);
+      --editing-bg:    #2d2200;
+      --banner-bg:     #2d2200;
+      --banner-border: #7d5c00;
+      --banner-text:   #ffd60a;
+      --split-ok:      #30d158;
+      --split-err:     #ff453a;
     }
 
     /* ===== リセット ===== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
       padding: 16px;
       transition: background 0.25s, color 0.25s;
+      -webkit-font-smoothing: antialiased;
     }
 
     .container { max-width: 640px; margin: 0 auto; }
@@ -97,24 +104,24 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
     }
 
     h1 {
-      font-size: 1.5rem;
+      font-size: 1.45rem;
       font-weight: 700;
-      color: var(--primary);
-      letter-spacing: 0.03em;
+      color: var(--text);
+      letter-spacing: -0.01em;
     }
 
     .dark-btn {
       cursor: pointer;
       background: var(--card);
-      border: 1.5px solid var(--border);
+      border: 1px solid var(--border);
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      font-size: 1.15rem;
+      width: 38px;
+      height: 38px;
+      font-size: 1.1rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -130,12 +137,13 @@
       gap: 8px;
       flex-wrap: wrap;
       background: var(--card);
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
       padding: 10px 14px;
       margin-bottom: 14px;
-      font-size: 0.88rem;
+      font-size: 0.87rem;
       color: var(--text-sub);
+      box-shadow: 0 1px 6px var(--shadow-card);
     }
 
     .restore-banner.show { display: flex; }
@@ -144,19 +152,20 @@
     /* ===== カード ===== */
     .card {
       background: var(--card);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 14px;
-      box-shadow: 0 2px 8px var(--shadow);
+      border-radius: 14px;
+      padding: 18px 18px 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 8px var(--shadow-card);
       transition: background 0.25s;
     }
 
     .card-title {
-      font-size: 0.92rem;
+      font-size: 0.8rem;
       font-weight: 700;
       margin-bottom: 12px;
       color: var(--text-sub);
-      letter-spacing: 0.02em;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
     .divider {
@@ -177,12 +186,12 @@
       flex: 1;
       min-width: 0;
       padding: 10px 12px;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
       font-size: 0.95rem;
       color: var(--text);
       background: var(--input-bg);
-      transition: border-color 0.2s, background 0.25s;
+      transition: border-color 0.18s, background 0.25s, box-shadow 0.18s;
       -webkit-appearance: none;
     }
 
@@ -190,6 +199,7 @@
       outline: none;
       border-color: var(--primary);
       background: var(--card);
+      box-shadow: 0 0 0 3px rgba(0,122,255,0.12);
     }
 
     input::placeholder { color: var(--text-muted); }
@@ -198,32 +208,33 @@
     button {
       cursor: pointer;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 0.9rem;
       font-weight: 600;
       padding: 10px 16px;
-      transition: filter 0.15s, transform 0.1s, background 0.25s, opacity 0.2s;
+      transition: filter 0.15s, transform 0.1s, opacity 0.2s;
       white-space: nowrap;
       line-height: 1.2;
     }
 
     button:active:not(:disabled) { transform: scale(0.97); }
-    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    button:disabled { opacity: 0.35; cursor: not-allowed; }
 
     .btn-add { background: var(--btn-add-bg); color: var(--btn-add-text); }
     .btn-add:hover:not(:disabled) { filter: brightness(0.94); }
 
-    .btn-del  { background: var(--btn-del-bg);  color: var(--btn-del-text);  padding: 7px 10px; font-size: 0.95rem; }
-    .btn-edit { background: var(--btn-edit-bg); color: var(--btn-edit-text); padding: 7px 10px; font-size: 0.78rem; }
+    .btn-del  { background: var(--btn-del-bg);  color: var(--btn-del-text);  padding: 7px 10px; font-size: 0.95rem; border-radius: 8px; }
+    .btn-edit { background: var(--btn-edit-bg); color: var(--btn-edit-text); padding: 7px 10px; font-size: 0.78rem; border-radius: 8px; }
 
     .btn-calc {
       width: 100%;
-      padding: 14px;
+      padding: 15px;
       font-size: 1.05rem;
       background: var(--primary);
       color: var(--primary-text);
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(43,108,176,0.35);
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,122,255,0.3);
+      letter-spacing: 0.01em;
     }
 
     .btn-calc:hover:not(:disabled) { filter: brightness(1.08); }
@@ -231,38 +242,33 @@
     .btn-rst {
       width: 100%;
       padding: 10px;
-      font-size: 0.88rem;
+      font-size: 0.87rem;
       background: var(--btn-rst-bg);
       color: var(--btn-rst-text);
       margin-top: 8px;
+      border-radius: 10px;
     }
 
     .btn-rst:hover { filter: brightness(0.95); }
 
     .btn-sm {
-      padding: 5px 10px;
-      font-size: 0.8rem;
-      border: 1.5px solid var(--border);
+      padding: 5px 11px;
+      font-size: 0.79rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
       background: var(--card);
       color: var(--text-sub);
-      border-radius: 6px;
+      border-radius: 7px;
     }
 
     .btn-sm:hover { background: var(--tbl-head); }
 
-    /* コピーボタン */
-    .btn-copy         { background: #e6fffa; color: #234e52; flex: 0 0 auto; padding: 10px 14px; }
-    [data-theme="dark"] .btn-copy { background: #234e52; color: #b2f5ea; }
+    /* ===== LINEシェアボタン ===== */
+    .btn-copy     { background: #e4f9f5; color: #006b5f; flex: 0 0 auto; padding: 10px 14px; border-radius: 10px; }
+    [data-theme="dark"] .btn-copy { background: #0d3b35; color: #5ecfbe; }
 
-    /* LINEシェアボタン */
-    .btn-line-item    { flex: 1; background: #d4edda; color: #155724; }
-    [data-theme="dark"] .btn-line-item { background: #1c4532; color: #9ae6b4; }
-
-    /* テーブル横スクロール（モバイル対応） */
-    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-
-    /* ===== シェア行 ===== */
-    .share-row { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-line-item { flex: 1; background: #d4edda; color: #155724; border-radius: 10px; }
+    [data-theme="dark"] .btn-line-item { background: #0d3322; color: #5fcf8a; }
 
     /* ===== メンバータグ ===== */
     .tag-list {
@@ -279,12 +285,11 @@
       gap: 4px;
       background: var(--tag-bg);
       color: var(--tag-text);
-      border: 1.5px solid var(--tag-border);
+      border: 1px solid var(--tag-border);
       border-radius: 20px;
       padding: 4px 12px 4px 14px;
-      font-size: 0.88rem;
+      font-size: 0.87rem;
       font-weight: 500;
-      transition: background 0.25s;
     }
 
     .tag .x {
@@ -306,10 +311,10 @@
       gap: 8px;
       background: var(--banner-bg);
       border: 1px solid var(--banner-border);
-      border-radius: 7px;
+      border-radius: 9px;
       padding: 7px 12px;
-      margin-bottom: 10px;
-      font-size: 0.85rem;
+      margin-bottom: 12px;
+      font-size: 0.84rem;
       color: var(--banner-text);
       transition: background 0.25s;
     }
@@ -321,7 +326,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 8px 0;
+      padding: 9px 0;
       border-bottom: 1px solid var(--border);
       flex-wrap: wrap;
     }
@@ -330,33 +335,69 @@
 
     .payment-item.editing {
       background: var(--editing-bg);
-      border-radius: 7px;
+      border-radius: 9px;
       padding: 8px;
       margin: 0 -4px;
     }
 
-    .payment-item .payer  { font-weight: 600; min-width: 56px; }
-    .payment-item .amount { color: var(--plus); font-weight: 700; }
-    .payment-item .desc   { color: var(--text-sub); font-size: 0.83rem; flex: 1; min-width: 50px; }
-    .payment-item .parts  { flex-basis: 100%; font-size: 0.78rem; color: var(--text-muted); padding-left: 2px; }
+    .payment-item .payer  { font-weight: 600; min-width: 56px; font-size: 0.9rem; }
+    .payment-item .amount { color: var(--plus); font-weight: 700; font-size: 0.9rem; }
+    .payment-item .desc   { color: var(--text-sub); font-size: 0.82rem; flex: 1; min-width: 50px; }
+    .payment-item .splits-tag {
+      flex-basis: 100%;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      padding-left: 2px;
+      margin-top: -2px;
+    }
 
-    /* ===== 負担者選択エリア ===== */
-    .participants-area {
+    /* ===== 分担設定エリア ===== */
+    .split-area {
       display: none;
-      margin-top: 8px;
-      padding: 10px 12px;
+      margin-top: 10px;
+      padding: 12px 14px;
       background: var(--row-bg);
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
       transition: background 0.25s;
     }
-    .participants-area.visible { display: block; }
+    .split-area.visible { display: block; }
+
+    /* セグメントコントロール */
+    .split-tabs {
+      display: flex;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 3px;
+      gap: 3px;
+      margin-bottom: 12px;
+    }
+    .split-tab {
+      flex: 1;
+      padding: 6px 0;
+      border-radius: 7px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      background: transparent;
+      color: var(--text-muted);
+      border: none;
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+    }
+    .split-tab.active {
+      background: var(--card);
+      color: var(--text);
+      box-shadow: 0 1px 4px var(--shadow);
+    }
+
+    /* 均等割りモード */
     .participants-header {
       display: flex;
       align-items: center;
       gap: 6px;
       margin-bottom: 8px;
-      font-size: 0.85rem;
+      font-size: 0.83rem;
       font-weight: 600;
       color: var(--text-sub);
     }
@@ -364,23 +405,60 @@
     .check-label {
       display: inline-flex;
       align-items: center;
-      padding: 4px 12px;
+      padding: 5px 13px;
       border: 1.5px solid var(--border);
       border-radius: 20px;
-      font-size: 0.83rem;
+      font-size: 0.82rem;
       cursor: pointer;
       background: var(--card);
       color: var(--text-sub);
       transition: background 0.15s, border-color 0.15s, color 0.15s;
       user-select: none;
     }
-    .check-label:hover { border-color: var(--primary); color: var(--text); }
+    .check-label:hover { border-color: var(--primary); }
     .check-label.checked {
       background: var(--tag-bg);
       border-color: var(--tag-border);
       color: var(--tag-text);
       font-weight: 600;
     }
+    .split-preview {
+      margin-top: 10px;
+      font-size: 0.81rem;
+      color: var(--text-sub);
+      min-height: 16px;
+    }
+
+    /* 金額指定モード */
+    .split-inputs { }
+    .split-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .split-row:last-of-type { border-bottom: none; }
+    .split-row .split-name { flex: 1; font-size: 0.88rem; font-weight: 500; }
+    .split-row .split-input {
+      width: 90px;
+      flex: 0 0 auto;
+      text-align: right;
+      padding: 6px 8px;
+      font-size: 0.88rem;
+    }
+    .split-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 10px;
+      margin-top: 6px;
+      border-top: 1px solid var(--border);
+      font-size: 0.81rem;
+    }
+    .split-ok  { color: var(--split-ok);  font-weight: 700; }
+    .split-err { color: var(--split-err); font-weight: 700; }
 
     /* ===== 結果エリア ===== */
     #result { display: none; }
@@ -388,7 +466,7 @@
     .balance-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.88rem;
+      font-size: 0.87rem;
     }
 
     .balance-table th {
@@ -408,14 +486,17 @@
 
     /* ===== 端数注記 ===== */
     .rounding-note {
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       color: var(--text-sub);
       margin-top: 8px;
       padding: 7px 10px;
       background: var(--row-bg);
-      border-radius: 6px;
+      border-radius: 8px;
       border-left: 3px solid var(--xfer-border);
     }
+
+    /* ===== テーブル横スクロール ===== */
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
     /* ===== 精算ステップ ===== */
     .transfer-list { list-style: none; }
@@ -424,50 +505,56 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 12px;
+      padding: 11px 12px;
       margin-bottom: 8px;
       background: var(--row-bg);
-      border-radius: 8px;
+      border-radius: 10px;
       border-left: 3px solid var(--xfer-border);
-      font-size: 0.93rem;
+      font-size: 0.92rem;
     }
 
-    .transfer-list li .arrow { color: var(--xfer-border); font-size: 1.1rem; }
+    .transfer-list li .arrow { color: var(--xfer-border); font-size: 1.05rem; }
     .transfer-list li .amt   { font-weight: 700; color: var(--tag-text); margin-left: auto; }
 
     .no-transfer {
       text-align: center;
-      padding: 16px;
+      padding: 18px;
       color: var(--plus);
       font-weight: 600;
+      font-size: 0.95rem;
     }
 
     /* ===== エラーメッセージ ===== */
     .error-msg {
       display: none;
       color: var(--minus);
-      font-size: 0.84rem;
-      margin-top: 4px;
+      font-size: 0.83rem;
+      margin-top: 5px;
     }
+
+    /* ===== シェア行 ===== */
+    .share-row { display: flex; gap: 8px; margin-top: 12px; }
 
     /* ===== トースト ===== */
     .toast {
       position: fixed;
-      bottom: 20px;
+      bottom: 24px;
       left: 50%;
-      transform: translateX(-50%) translateY(90px);
-      background: #2d3748;
+      transform: translateX(-50%) translateY(80px);
+      background: rgba(28,28,30,0.88);
       color: #fff;
       padding: 10px 22px;
       border-radius: 22px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 500;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.28);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
       z-index: 9999;
       white-space: nowrap;
       pointer-events: none;
+      backdrop-filter: blur(8px);
       transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
     }
+    [data-theme="dark"] .toast { background: rgba(240,240,245,0.9); color: #1c1c1e; }
 
     .toast.show { transform: translateX(-50%) translateY(0); }
 
@@ -482,7 +569,7 @@
 
   <!-- ヘッダー -->
   <div class="header">
-    <h1>💴 割り勘精算計算機</h1>
+    <h1>💴 割り勘</h1>
     <button class="dark-btn" id="darkBtn" onclick="toggleDark()" title="ダーク／ライト切替">🌙</button>
   </div>
 
@@ -497,9 +584,9 @@
 
   <!-- ① メンバーカード -->
   <div class="card">
-    <div class="card-title">👥 メンバー</div>
+    <div class="card-title">メンバー</div>
     <div class="row">
-      <input type="text" id="memberInput" placeholder="名前を入力（例: 田中）" maxlength="20">
+      <input type="text" id="memberInput" placeholder="名前を入力（例：田中）" maxlength="20">
       <button class="btn-add" onclick="addMember()">追加</button>
     </div>
     <p class="error-msg" id="memberError"></p>
@@ -508,7 +595,7 @@
 
   <!-- ② 支払い入力カード -->
   <div class="card">
-    <div class="card-title">💳 支払い入力</div>
+    <div class="card-title">支払い入力</div>
 
     <!-- 編集中バナー -->
     <div class="edit-banner" id="editBanner">
@@ -523,18 +610,39 @@
       <input type="number" id="amountInput" placeholder="金額（円）" min="1" step="1" inputmode="numeric">
     </div>
     <div class="row">
-      <input type="text" id="descInput" placeholder="内容（例: 夕食、交通費）" maxlength="30">
+      <input type="text" id="descInput" placeholder="内容（例：夕食、交通費）" maxlength="30">
       <button class="btn-add" id="paySubmitBtn" onclick="submitPayment()">追加</button>
     </div>
 
-    <!-- 負担者選択 -->
-    <div class="participants-area" id="participantsArea">
-      <div class="participants-header">
-        <span>👥 負担者</span>
-        <button type="button" class="btn-sm" onclick="selectAllParticipants()">全員</button>
-        <button type="button" class="btn-sm" onclick="clearParticipants()">クリア</button>
+    <!-- 分担設定エリア -->
+    <div class="split-area" id="splitArea">
+
+      <!-- モード切替タブ -->
+      <div class="split-tabs">
+        <button class="split-tab active" id="tabEqual"  onclick="setSplitMode('equal')">均等割り</button>
+        <button class="split-tab"        id="tabCustom" onclick="setSplitMode('custom')">金額指定</button>
       </div>
-      <div class="check-list" id="participantsChecks"></div>
+
+      <!-- 均等割りモード -->
+      <div id="equalArea">
+        <div class="participants-header">
+          <span>負担者</span>
+          <button type="button" class="btn-sm" onclick="selectAllParticipants()">全員</button>
+          <button type="button" class="btn-sm" onclick="clearParticipants()">クリア</button>
+        </div>
+        <div class="check-list" id="participantsChecks"></div>
+        <div class="split-preview" id="equalPreview"></div>
+      </div>
+
+      <!-- 金額指定モード -->
+      <div id="customArea" style="display:none">
+        <div class="split-inputs" id="customSplitInputs"></div>
+        <div class="split-footer">
+          <span id="splitRemainingText"></span>
+          <button type="button" class="btn-sm" onclick="resetToEqual()">均等にする</button>
+        </div>
+      </div>
+
     </div>
 
     <p class="error-msg" id="paymentError"></p>
@@ -547,7 +655,7 @@
 
   <!-- ④ 結果カード -->
   <div class="card mt12" id="result">
-    <div class="card-title">📊 収支サマリー</div>
+    <div class="card-title">収支サマリー</div>
     <div class="table-wrap">
       <table class="balance-table">
         <thead>
@@ -565,7 +673,7 @@
 
     <hr class="divider">
 
-    <div class="card-title">🔁 最小送金プラン</div>
+    <div class="card-title">最小送金プラン</div>
     <div id="transferResult"></div>
 
     <!-- コピー / LINE -->
@@ -586,12 +694,13 @@
   // ===== 状態 =====
   const state = {
     members:   [],
-    payments:  [],
+    payments:  [],   // { id, payer, amount, desc, splits:[{userId,amount}], createdAt }
     editIndex: -1,
     lastCalc:  null
   };
 
   let pendingSaved = null;
+  let splitMode = 'equal'; // 'equal' | 'custom'
 
   // ===== ユーティリティ =====
   const $ = id => document.getElementById(id);
@@ -631,8 +740,12 @@
       .replace(/'/g, '&#39;');
   }
 
+  function genId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  }
+
   // ===== localStorage 永続化 =====
-  const STORE_KEY = 'warikan_v2';
+  const STORE_KEY = 'warikan_v3';
 
   function saveState() {
     try {
@@ -645,7 +758,8 @@
 
   function initFromStorage() {
     try {
-      const raw = localStorage.getItem(STORE_KEY);
+      const raw = localStorage.getItem(STORE_KEY)
+               || localStorage.getItem('warikan_v2'); // 旧バージョン互換
       if (!raw) return;
       const data = JSON.parse(raw);
       const hasData = (data.members  && data.members.length  > 0) ||
@@ -662,7 +776,8 @@
   function applyRestore() {
     if (!pendingSaved) return;
     state.members  = pendingSaved.members  || [];
-    state.payments = pendingSaved.payments || [];
+    // 旧データ（participants）を splits に移行
+    state.payments = (pendingSaved.payments || []).map(migrateLegacyPayment);
     pendingSaved = null;
     $('restoreBanner').classList.remove('show');
     renderAll();
@@ -673,6 +788,26 @@
     pendingSaved = null;
     $('restoreBanner').classList.remove('show');
     localStorage.removeItem(STORE_KEY);
+    localStorage.removeItem('warikan_v2');
+  }
+
+  /**
+   * 旧フォーマット（participants[]）→新フォーマット（splits[]）へ変換
+   * 既に splits があればそのまま返す
+   */
+  function migrateLegacyPayment(p) {
+    if (p.splits && p.splits.length > 0) return p;
+    const parts = (p.participants && p.participants.length > 0)
+      ? p.participants
+      : state.members;
+    return {
+      id:        p.id        || genId(),
+      payer:     p.payer,
+      amount:    p.amount,
+      desc:      p.desc      || '（記録なし）',
+      splits:    computeEqualSplits(p.amount, parts),
+      createdAt: p.createdAt || Date.now()
+    };
   }
 
   // ===== ダークモード =====
@@ -719,7 +854,7 @@
     input.value = '';
     renderMembers();
     syncPayerSelect();
-    renderParticipantsChecks();
+    refreshSplitArea();
     updateCalcBtn();
     saveState();
   }
@@ -733,7 +868,7 @@
 
     state.payments = state.payments.filter(p => p.payer !== name);
     state.payments.forEach(p => {
-      if (p.participants) p.participants = p.participants.filter(n => n !== name);
+      if (p.splits) p.splits = p.splits.filter(s => s.userId !== name);
     });
     state.members = state.members.filter(m => m !== name);
     cancelEdit();
@@ -745,7 +880,7 @@
   function renderMembers() {
     const list = $('memberList');
     if (state.members.length === 0) {
-      list.innerHTML = '<span style="color:var(--text-muted);font-size:0.85rem;">メンバーがいません</span>';
+      list.innerHTML = '<span style="color:var(--text-muted);font-size:0.84rem;">メンバーがいません</span>';
       return;
     }
     list.innerHTML = state.members.map(name => `
@@ -765,19 +900,53 @@
       ).join('');
   }
 
-  // ===== 負担者チェックボックス =====
-  function renderParticipantsChecks() {
-    const area = $('participantsArea');
-    const list = $('participantsChecks');
-
+  // ===== 分担設定エリア全体の表示制御 =====
+  function refreshSplitArea() {
+    const area = $('splitArea');
     if (state.members.length === 0) {
       area.classList.remove('visible');
-      list.innerHTML = '';
       return;
     }
     area.classList.add('visible');
+    if (splitMode === 'equal') {
+      renderParticipantsChecks();
+      updateEqualPreview();
+    } else {
+      renderCustomSplitInputs();
+    }
+  }
 
-    // 既存のチェック状態を保持（新規メンバーはデフォルトでチェック）
+  // ===== モード切替 =====
+  function setSplitMode(mode) {
+    splitMode = mode;
+    $('tabEqual').classList.toggle('active',  mode === 'equal');
+    $('tabCustom').classList.toggle('active', mode === 'custom');
+    $('equalArea').style.display  = mode === 'equal'  ? '' : 'none';
+    $('customArea').style.display = mode === 'custom' ? '' : 'none';
+    if (mode === 'equal')  { renderParticipantsChecks(); updateEqualPreview(); }
+    if (mode === 'custom') { renderCustomSplitInputs(); }
+  }
+
+  // ===== 均等割りモード =====
+
+  /**
+   * 均等割り: 端数は最後の参加者に集約（決定的ルール）
+   */
+  function computeEqualSplits(amount, participants) {
+    if (!participants || participants.length === 0) return [];
+    const n     = participants.length;
+    const share = Math.floor(amount / n);
+    const rem   = amount - share * n;
+    return participants.map((userId, i) => ({
+      userId,
+      amount: i === n - 1 ? share + rem : share
+    }));
+  }
+
+  function renderParticipantsChecks() {
+    const list = $('participantsChecks');
+    if (state.members.length === 0) { list.innerHTML = ''; return; }
+
     const existingNames   = new Set(Array.from(list.querySelectorAll('.check-label')).map(el => el.dataset.name));
     const existingChecked = new Set(Array.from(list.querySelectorAll('.check-label.checked')).map(el => el.dataset.name));
 
@@ -787,14 +956,19 @@
     }).join('');
   }
 
-  function toggleParticipant(el) { el.classList.toggle('checked'); }
+  function toggleParticipant(el) {
+    el.classList.toggle('checked');
+    updateEqualPreview();
+  }
 
   function selectAllParticipants() {
     document.querySelectorAll('#participantsChecks .check-label').forEach(el => el.classList.add('checked'));
+    updateEqualPreview();
   }
 
   function clearParticipants() {
     document.querySelectorAll('#participantsChecks .check-label').forEach(el => el.classList.remove('checked'));
+    updateEqualPreview();
   }
 
   function getSelectedParticipants() {
@@ -807,6 +981,103 @@
     document.querySelectorAll('#participantsChecks .check-label').forEach(el => {
       el.classList.toggle('checked', nameSet.has(el.dataset.name));
     });
+    updateEqualPreview();
+  }
+
+  function updateEqualPreview() {
+    const preview      = $('equalPreview');
+    const participants = getSelectedParticipants();
+    const amount       = parseInt($('amountInput').value, 10);
+
+    if (participants.length === 0 || !amount || amount < 1) {
+      preview.textContent = '';
+      return;
+    }
+
+    const share = Math.floor(amount / participants.length);
+    const rem   = amount - share * participants.length;
+
+    if (rem > 0) {
+      const last = participants[participants.length - 1];
+      preview.textContent = `1人あたり ${fmt(share)} ／ ${esc(last)} のみ +¥${rem}（端数）`;
+    } else {
+      preview.textContent = `1人あたり ${fmt(share)}`;
+    }
+  }
+
+  // ===== 金額指定モード =====
+
+  function renderCustomSplitInputs(preserveValues = false) {
+    const area   = $('customSplitInputs');
+    const amount = parseInt($('amountInput').value, 10) || 0;
+
+    // 既存の入力値を保持するか均等から計算するか
+    let initialValues = {};
+    if (preserveValues) {
+      area.querySelectorAll('.split-row').forEach(row => {
+        const val = parseInt(row.querySelector('.split-input').value, 10);
+        if (!isNaN(val)) initialValues[row.dataset.name] = val;
+      });
+    }
+
+    const splits = computeEqualSplits(amount, state.members);
+
+    area.innerHTML = splits.map(s => {
+      const val = preserveValues && initialValues[s.userId] !== undefined
+        ? initialValues[s.userId]
+        : s.amount;
+      return `
+        <div class="split-row" data-name="${esc(s.userId)}">
+          <span class="split-name">${esc(s.userId)}</span>
+          <input class="split-input" type="number" min="0" step="1" inputmode="numeric"
+                 value="${val}"
+                 oninput="this.value=this.value.replace(/[^0-9]/g,''); updateCustomRemaining()">
+        </div>
+      `;
+    }).join('');
+
+    updateCustomRemaining();
+  }
+
+  function updateCustomRemaining() {
+    const amount = parseInt($('amountInput').value, 10) || 0;
+    const inputs = $('customSplitInputs').querySelectorAll('.split-input');
+    const summed = Array.from(inputs).reduce((s, el) => s + (parseInt(el.value, 10) || 0), 0);
+    const diff   = amount - summed;
+    const el     = $('splitRemainingText');
+
+    if (diff === 0 && amount > 0) {
+      el.innerHTML = `<span class="split-ok">✓ 合計 ${fmt(amount)}</span>`;
+    } else if (diff > 0) {
+      el.innerHTML = `<span class="split-err">残 ${fmt(diff)}</span>`;
+    } else if (diff < 0) {
+      el.innerHTML = `<span class="split-err">超過 ${fmt(Math.abs(diff))}</span>`;
+    } else {
+      el.innerHTML = '';
+    }
+  }
+
+  function resetToEqual() {
+    renderCustomSplitInputs(false);
+  }
+
+  // ===== 現在のUIから splits を構築 =====
+  function getBuiltSplits() {
+    const amount = parseInt($('amountInput').value, 10) || 0;
+
+    if (splitMode === 'equal') {
+      const participants = getSelectedParticipants();
+      return computeEqualSplits(amount, participants);
+    }
+
+    // custom: 0円の人は除外
+    const splits = [];
+    $('customSplitInputs').querySelectorAll('.split-row').forEach(row => {
+      const userId = row.dataset.name;
+      const amt    = parseInt(row.querySelector('.split-input').value, 10) || 0;
+      if (amt > 0) splits.push({ userId, amount: amt });
+    });
+    return splits;
   }
 
   // ===== 支払い =====
@@ -821,10 +1092,29 @@
     if (isNaN(amount) || amount < 1) { showError('paymentError', '1円以上の整数を入力してください'); return; }
     if (amount > 999_999_999)        { showError('paymentError', '金額が大きすぎます（上限9桁）'); return; }
 
-    const participants = getSelectedParticipants();
-    if (participants.length === 0)    { showError('paymentError', '負担者を1人以上選択してください'); return; }
+    const splits = getBuiltSplits();
+    if (splits.length === 0) {
+      showError('paymentError', '負担者を1人以上選択してください');
+      return;
+    }
 
-    const entry = { payer, amount, desc: desc || '（記録なし）', participants };
+    // 金額指定モードの合計チェック
+    if (splitMode === 'custom') {
+      const total = splits.reduce((s, sp) => s + sp.amount, 0);
+      if (total !== amount) {
+        showError('paymentError', `負担額の合計（${fmt(total)}）が支払金額（${fmt(amount)}）と一致しません`);
+        return;
+      }
+    }
+
+    const entry = {
+      id:        state.editIndex >= 0 ? state.payments[state.editIndex].id : genId(),
+      payer,
+      amount,
+      desc:      desc || '（記録なし）',
+      splits,
+      createdAt: state.editIndex >= 0 ? state.payments[state.editIndex].createdAt : Date.now()
+    };
 
     if (state.editIndex >= 0) {
       state.payments[state.editIndex] = entry;
@@ -837,6 +1127,7 @@
     $('amountInput').value = '';
     $('descInput').value   = '';
     $('payerSelect').value = '';
+    setSplitMode('equal');
     selectAllParticipants();
     renderPayments();
     updateCalcBtn();
@@ -852,9 +1143,30 @@
     $('descInput').value          = p.desc === '（記録なし）' ? '' : p.desc;
     $('paySubmitBtn').textContent = '更新';
     $('editBanner').classList.add('show');
-    // 負担者チェックを復元
-    const saved = p.participants && p.participants.length > 0 ? p.participants : state.members;
-    setCheckedParticipants(saved);
+
+    const splits = p.splits || [];
+
+    // 均等割りかどうか判定
+    const participants = splits.map(s => s.userId);
+    const equalSplits  = computeEqualSplits(p.amount, participants);
+    const isEqual = splits.length === equalSplits.length &&
+      splits.every((s, i) => s.userId === equalSplits[i].userId && s.amount === equalSplits[i].amount);
+
+    if (isEqual) {
+      setSplitMode('equal');
+      setCheckedParticipants(participants);
+    } else {
+      setSplitMode('custom');
+      // カスタム入力を手動で設定
+      const area = $('customSplitInputs');
+      renderCustomSplitInputs(false);
+      splits.forEach(s => {
+        const row = area.querySelector(`.split-row[data-name="${s.userId}"]`);
+        if (row) row.querySelector('.split-input').value = s.amount;
+      });
+      updateCustomRemaining();
+    }
+
     renderPayments();
     $('payerSelect').scrollIntoView({ behavior: 'smooth', block: 'center' });
     $('payerSelect').focus();
@@ -868,6 +1180,7 @@
     $('descInput').value          = '';
     $('paySubmitBtn').textContent = '追加';
     $('editBanner').classList.remove('show');
+    setSplitMode('equal');
     selectAllParticipants();
     renderPayments();
   }
@@ -885,12 +1198,29 @@
   function renderPayments() {
     const list = $('paymentList');
     if (state.payments.length === 0) {
-      list.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;">支払い記録がありません</p>';
+      list.innerHTML = '<p style="color:var(--text-muted);font-size:0.84rem;">支払い記録がありません</p>';
       return;
     }
     list.innerHTML = state.payments.map((p, i) => {
-      const parts = (p.participants && p.participants.length > 0) ? p.participants : state.members;
-      const partsLabel = parts.length === state.members.length ? '👥 全員' : '👥 ' + parts.map(esc).join('・');
+      const splits = p.splits || [];
+      let splitsTag = '';
+      if (splits.length === 0) {
+        splitsTag = '👥 負担者なし';
+      } else if (splits.length === state.members.length) {
+        splitsTag = '👥 全員';
+      } else {
+        splitsTag = '👥 ' + splits.map(s => esc(s.userId)).join('・');
+      }
+      // 均等かカスタムか
+      const participants = splits.map(s => s.userId);
+      const equalSplits  = computeEqualSplits(p.amount, participants);
+      const isEqual = splits.length > 0 && splits.every((s, i) =>
+        s.userId === (equalSplits[i] && equalSplits[i].userId) &&
+        s.amount === (equalSplits[i] && equalSplits[i].amount)
+      );
+      if (!isEqual && splits.length > 0) {
+        splitsTag += '（金額指定）';
+      }
       return `
         <div class="payment-item${state.editIndex === i ? ' editing' : ''}">
           <span class="payer">${esc(p.payer)}</span>
@@ -898,7 +1228,7 @@
           <span class="desc">${esc(p.desc)}</span>
           <button class="btn-edit" onclick="startEdit(${i})" title="編集">✏️</button>
           <button class="btn-del"  onclick="removePayment(${i})" title="削除">×</button>
-          <span class="parts">${partsLabel}</span>
+          <span class="splits-tag">${splitsTag}</span>
         </div>
       `;
     }).join('');
@@ -911,22 +1241,19 @@
     state.members.forEach(m => { paid[m] = 0; });
     state.payments.forEach(p => { paid[p.payer] += p.amount; });
 
-    // 負担合計（participants 別の均等割り、端数切り捨て）
+    // 負担合計（splits ベース）
     const burden = {};
     state.members.forEach(m => { burden[m] = 0; });
     let hasRounding = false;
 
     state.payments.forEach(p => {
-      // participants が未設定の場合は全員（旧データ互換）
-      const parts = (p.participants && p.participants.length > 0)
-        ? p.participants.filter(m => state.members.includes(m))
-        : state.members;
-      if (parts.length === 0) return;
-
-      const share = Math.floor(p.amount / parts.length);
-      const rem   = p.amount - share * parts.length;
-      if (rem > 0) hasRounding = true;
-      parts.forEach(m => { burden[m] += share; });
+      const splits = p.splits || [];
+      splits.forEach(s => {
+        if (burden[s.userId] !== undefined) burden[s.userId] += s.amount;
+      });
+      // 端数チェック: splits の合計が amount に満たない場合
+      const splitsTotal = splits.reduce((s, sp) => s + sp.amount, 0);
+      if (splitsTotal < p.amount) hasRounding = true;
     });
 
     // 収支 = 支払った − 負担した
@@ -949,7 +1276,7 @@
 
     const noteEl = $('roundingNote');
     if (hasRounding) {
-      noteEl.textContent = '※各支払いの端数は切り捨てています';
+      noteEl.textContent = '※端数は切り捨てています（最後の負担者に集約）';
       noteEl.style.display = 'block';
     } else {
       noteEl.style.display = 'none';
@@ -969,10 +1296,10 @@
 
     const div = $('transferResult');
     if (transfers.length === 0) {
-      div.innerHTML = '<div class="no-transfer">🎉 精算不要！みんな均等に支払っています</div>';
+      div.innerHTML = '<div class="no-transfer">🎉 精算不要！全員均等に支払っています</div>';
     } else {
       div.innerHTML = `
-        <p style="font-size:0.84rem;color:var(--text-sub);margin-bottom:10px;">
+        <p style="font-size:0.83rem;color:var(--text-sub);margin-bottom:10px;">
           合計 <strong>${transfers.length} 回</strong> の送金で精算できます
         </p>
         <ul class="transfer-list">
@@ -996,16 +1323,14 @@
 
   /**
    * Greedy法: 最大の債権者と債務者を順次相殺して最小送金数を実現
-   * 全額が整数なので浮動小数点誤差なし
-   * credits > debits の場合（端数切り捨て時）は残額が自然に吸収される
    */
   function greedySettle(creditors, debtors) {
     const transfers = [];
     let ci = 0, di = 0;
 
     while (ci < creditors.length && di < debtors.length) {
-      const cr = creditors[ci];
-      const de = debtors[di];
+      const cr     = creditors[ci];
+      const de     = debtors[di];
       const amount = Math.min(cr.amount, de.amount);
 
       if (amount > 0) transfers.push({ from: de.name, to: cr.name, amount });
@@ -1097,7 +1422,8 @@
     renderMembers();
     renderPayments();
     syncPayerSelect();
-    renderParticipantsChecks();
+    setSplitMode('equal');
+    refreshSplitArea();
     selectAllParticipants();
     updateCalcBtn();
     $('paySubmitBtn').textContent = '追加';
@@ -1111,6 +1437,8 @@
 
   $('amountInput').addEventListener('input', function() {
     this.value = this.value.replace(/[^0-9]/g, '');
+    if (splitMode === 'equal')  updateEqualPreview();
+    if (splitMode === 'custom') updateCustomRemaining();
   });
 
   // ===== 初期化 =====
