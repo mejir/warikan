@@ -1,6 +1,6 @@
 {
-  "name": "割り勘精算計算機",
-  "short_name": "割り勘",
+  "name": "Splits",
+  "short_name": "Splits",
   "description": "割り勘の精算を最小送金回数で計算するアプリ",
   "start_url": "./",
   "scope": "./",
