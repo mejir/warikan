@@ -1,13 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
-  <rect width="192" height="192" rx="32" fill="#2b6cb0"/>
-  <text x="96" y="112"
-        text-anchor="middle"
-        font-family="'Helvetica Neue',Arial,sans-serif"
-        font-size="96" font-weight="700"
-        fill="#ffffff">¥</text>
-  <text x="96" y="152"
-        text-anchor="middle"
-        font-family="'Helvetica Neue',Arial,sans-serif"
-        font-size="22" font-weight="600"
-        fill="rgba(255,255,255,0.72)">割り勘</text>
+  <defs>
+    <linearGradient id="bg" x1="25%" y1="0%" x2="75%" y2="100%">
+      <stop offset="0%"   stop-color="#4da3ff"/>
+      <stop offset="100%" stop-color="#0048c8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Squircle background (iOS 22% corner radius) -->
+  <rect width="192" height="192" rx="42" fill="url(#bg)"/>
+
+  <!-- Source node -->
+  <circle cx="96" cy="46" r="14" fill="white"/>
+
+  <!-- Stem -->
+  <line x1="96" y1="60" x2="96" y2="96"
+        stroke="white" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- Horizontal bar -->
+  <line x1="48" y1="96" x2="144" y2="96"
+        stroke="white" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- Left branch -->
+  <line x1="48" y1="96" x2="48" y2="132"
+        stroke="white" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- Center branch -->
+  <line x1="96" y1="96" x2="96" y2="132"
+        stroke="white" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- Right branch -->
+  <line x1="144" y1="96" x2="144" y2="132"
+        stroke="white" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- Destination nodes -->
+  <circle cx="48"  cy="146" r="14" fill="white"/>
+  <circle cx="96"  cy="146" r="14" fill="white"/>
+  <circle cx="144" cy="146" r="14" fill="white"/>
 </svg>
