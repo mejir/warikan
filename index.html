@@ -87,8 +87,8 @@
       background-attachment: fixed;
       color: var(--text);
       min-height: 100vh;
-      /* 固定ボタンバー分の余白（グラデーション40px＋ボタン52px＋下余白20px）*/
-      padding-bottom: 116px;
+      /* 固定ボタン分（グラデーション40px＋ボタン~52px＋下オフセット16px）*/
+      padding-bottom: 96px;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -456,11 +456,6 @@
     .lbl-em { font-size: 0.96rem; flex-shrink: 0; }
     .field-row input,
     .field-row select { flex: 1; min-width: 0; margin: 0; }
-    .field-submit {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 4px;
-    }
 
     /* ── Payment list ── */
     .payment-item {
@@ -631,51 +626,34 @@
     [data-theme="dark"] .toast { background: rgba(240,240,245,0.93); color: #1c1c1e; }
     .toast.show { transform: translateX(-50%) translateY(0); }
 
-    /* ── Payment list scroll area ── */
-    #paymentList {
-      max-height: 320px;
-      overflow-y: scroll;          /* 常時スクロールバー確保 */
-      overflow-x: hidden;
-      padding-right: 6px;
-      margin-right: -6px;          /* スクロールバー分の食み出しを相殺 */
-      /* Firefox */
-      scrollbar-width: thin;
-      scrollbar-color: rgba(0,122,255,0.38) transparent;
-    }
-    #paymentList::-webkit-scrollbar { width: 4px; }
-    #paymentList::-webkit-scrollbar-track { background: transparent; }
-    #paymentList::-webkit-scrollbar-thumb {
-      background: rgba(0,122,255,0.35);
-      border-radius: 4px;
-    }
-    #paymentList::-webkit-scrollbar-thumb:hover {
-      background: rgba(0,122,255,0.6);
-    }
-    [data-theme="dark"] #paymentList::-webkit-scrollbar-thumb {
-      background: rgba(10,132,255,0.4);
-    }
-    [data-theme="dark"] #paymentList::-webkit-scrollbar-thumb:hover {
-      background: rgba(10,132,255,0.7);
-    }
-
     /* ── Fixed bottom calc bar ── */
     .calc-bar {
       position: fixed;
-      bottom: 0; left: 0; right: 0;
+      bottom: 16px; left: 0; right: 0;
       z-index: 100;
       pointer-events: none;
     }
     .calc-bar-inner {
       max-width: 600px;
       margin: 0 auto;
-      padding: 40px 16px calc(20px + env(safe-area-inset-bottom, 0px));
-      /* 上部フェード: 背景グラデーション末端色へ自然に溶け込む */
-      background: linear-gradient(to bottom, transparent 0%, var(--bg-b) 38%);
+      padding: 44px 16px 0;
+      /* スクロール中「下に続く」をグラデーションで表現（色なしバー） */
+      background: linear-gradient(to bottom, transparent 0%, var(--bg-b) 42%);
       pointer-events: auto;
     }
     #calcError {
       margin-bottom: 6px;
       margin-top: 0;
+    }
+
+    /* ── Submit row (below split area) ── */
+    .submit-row {
+      margin-top: 14px;
+    }
+    .submit-row .btn-primary {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
     }
 
     /* ── Utility ── */
@@ -734,9 +712,6 @@
       <div class="field-label"><span class="lbl-em">👤</span>誰が払った？</div>
       <select id="payerSelect"><option value="">選択してください</option></select>
     </div>
-    <div class="field-submit">
-      <button class="btn-primary" id="paySubmitBtn" onclick="submitPayment()">➕ 追加</button>
-    </div>
 
     <!-- Split area -->
     <div class="split-area" id="splitArea">
@@ -763,6 +738,10 @@
         <div class="check-list" id="participantsChecks"></div>
         <div class="split-preview" id="equalPreview"></div>
       </div>
+    </div>
+
+    <div class="submit-row">
+      <button class="btn-primary" id="paySubmitBtn" onclick="submitPayment()">➕ 追加</button>
     </div>
 
     <p class="error-msg" id="paymentError"></p>
@@ -798,7 +777,7 @@
 <div class="calc-bar">
   <div class="calc-bar-inner">
     <p class="error-msg center" id="calcError"></p>
-    <button class="btn-calc" id="calcBtn" onclick="calculate()" disabled>精算を計算する</button>
+    <button class="btn-calc" id="calcBtn" onclick="calculate()" disabled>精算する</button>
   </div>
 </div>
 
