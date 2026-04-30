@@ -87,7 +87,8 @@
       background-attachment: fixed;
       color: var(--text);
       min-height: 100vh;
-      padding-bottom: 48px;
+      /* 固定ボタンバー分の余白（グラデーション40px＋ボタン52px＋下余白20px）*/
+      padding-bottom: 116px;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -497,7 +498,8 @@
       background: var(--row-bg);
       border-radius: 10px;
       overflow: hidden;
-      max-height: 150px;
+      /* 1行 ≒ 32px（padding 6×2 + line-height ~19 + border 1）× 4行 = 128px */
+      max-height: 128px;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
@@ -629,6 +631,53 @@
     [data-theme="dark"] .toast { background: rgba(240,240,245,0.93); color: #1c1c1e; }
     .toast.show { transform: translateX(-50%) translateY(0); }
 
+    /* ── Payment list scroll area ── */
+    #paymentList {
+      max-height: 320px;
+      overflow-y: scroll;          /* 常時スクロールバー確保 */
+      overflow-x: hidden;
+      padding-right: 6px;
+      margin-right: -6px;          /* スクロールバー分の食み出しを相殺 */
+      /* Firefox */
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,122,255,0.38) transparent;
+    }
+    #paymentList::-webkit-scrollbar { width: 4px; }
+    #paymentList::-webkit-scrollbar-track { background: transparent; }
+    #paymentList::-webkit-scrollbar-thumb {
+      background: rgba(0,122,255,0.35);
+      border-radius: 4px;
+    }
+    #paymentList::-webkit-scrollbar-thumb:hover {
+      background: rgba(0,122,255,0.6);
+    }
+    [data-theme="dark"] #paymentList::-webkit-scrollbar-thumb {
+      background: rgba(10,132,255,0.4);
+    }
+    [data-theme="dark"] #paymentList::-webkit-scrollbar-thumb:hover {
+      background: rgba(10,132,255,0.7);
+    }
+
+    /* ── Fixed bottom calc bar ── */
+    .calc-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 100;
+      pointer-events: none;
+    }
+    .calc-bar-inner {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+      /* 上部フェード: 背景グラデーション末端色へ自然に溶け込む */
+      background: linear-gradient(to bottom, transparent 0%, var(--bg-b) 38%);
+      pointer-events: auto;
+    }
+    #calcError {
+      margin-bottom: 6px;
+      margin-top: 0;
+    }
+
     /* ── Utility ── */
     .mt10 { margin-top: 10px; }
     .mt14 { margin-top: 14px; }
@@ -720,10 +769,6 @@
     <div id="paymentList" class="mt10"></div>
   </div>
 
-  <!-- ③ Calculate -->
-  <button class="btn-calc mt14" id="calcBtn" onclick="calculate()" disabled>精算を計算する</button>
-  <p class="error-msg center" id="calcError" style="margin-top:8px;"></p>
-
   <!-- ④ Result -->
   <div class="card mt14" id="result">
     <div class="sec-label" style="margin-bottom:11px;">収支サマリー</div>
@@ -747,6 +792,14 @@
     <button class="btn-reset" onclick="resetAll()">🔄 リセット</button>
   </div>
 
+</div>
+
+<!-- Fixed bottom: calc button -->
+<div class="calc-bar">
+  <div class="calc-bar-inner">
+    <p class="error-msg center" id="calcError"></p>
+    <button class="btn-calc" id="calcBtn" onclick="calculate()" disabled>精算を計算する</button>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
