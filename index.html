@@ -433,27 +433,106 @@
     .split-ok  { color: var(--split-ok);  font-weight: 700; }
     .split-err { color: var(--split-err); font-weight: 700; }
 
+    /* ── Labeled field rows (payment form) ── */
+    .field-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 9px;
+    }
+    .field-label {
+      flex: 0 0 auto;
+      width: 118px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.81rem;
+      font-weight: 500;
+      color: var(--text-sub);
+      line-height: 1.3;
+      user-select: none;
+    }
+    .lbl-em { font-size: 0.96rem; flex-shrink: 0; }
+    .field-row input,
+    .field-row select { flex: 1; min-width: 0; margin: 0; }
+    .field-submit {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+
     /* ── Payment list ── */
     .payment-item {
-      display: flex; align-items: center; gap: 8px;
       padding: 11px 0;
       border-bottom: 1px solid var(--border);
-      transition: background 0.15s;
     }
     .payment-item:last-child { border-bottom: none; }
     .payment-item.editing {
       background: var(--editing-bg);
       border-radius: 12px;
-      padding: 10px 11px;
-      margin: 0 -11px;
+      padding: 10px 12px;
+      margin: 0 -12px;
       border-bottom: none;
     }
-    .pi-info { flex: 1; min-width: 0; }
-    .pi-top  { display: flex; align-items: baseline; gap: 8px; }
-    .pi-payer  { font-size: 0.87rem; font-weight: 700; }
-    .pi-amount { font-size: 1rem; font-weight: 700; color: var(--primary); }
-    .pi-meta   { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
-    .pi-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .pi-header-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pi-title {
+      flex: 1; min-width: 0;
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+    .pi-payer  { font-size: 0.88rem; font-weight: 700; }
+    .pi-desc   { font-size: 0.78rem; color: var(--text-muted); }
+    .pi-amount { font-size: 0.98rem; font-weight: 700; color: var(--primary); flex-shrink: 0; }
+    .pi-actions { display: flex; gap: 5px; flex-shrink: 0; }
+
+    /* Splits breakdown */
+    .pi-splits {
+      margin-top: 8px;
+      background: var(--row-bg);
+      border-radius: 10px;
+      overflow: hidden;
+      max-height: 150px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .pi-split-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 11px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.84rem;
+      gap: 8px;
+    }
+    .pi-split-row:last-child { border-bottom: none; }
+    .pi-split-name {
+      font-weight: 500;
+      color: var(--text);
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pi-split-amt {
+      font-weight: 600;
+      color: var(--text-sub);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .pi-split-rem {
+      font-size: 0.72rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-left: 4px;
+    }
 
     /* ── Error ── */
     .error-msg {
@@ -594,15 +673,20 @@
       <button class="btn-pill btn-pill-warn" onclick="cancelEdit()">キャンセル</button>
     </div>
 
-    <div class="row">
-      <select id="payerSelect">
-        <option value="">支払い者</option>
-      </select>
-      <input type="number" id="amountInput" placeholder="金額（円）" min="1" step="1" inputmode="numeric">
+    <div class="field-row">
+      <div class="field-label"><span class="lbl-em">📍</span>どこで使った？</div>
+      <input type="text" id="descInput" placeholder="夕食・交通費など" maxlength="30">
     </div>
-    <div class="row">
-      <input type="text" id="descInput" placeholder="内容（例：夕食・交通費）" maxlength="30">
-      <button class="btn-primary" id="paySubmitBtn" onclick="submitPayment()">追加</button>
+    <div class="field-row">
+      <div class="field-label"><span class="lbl-em">💴</span>いくら？</div>
+      <input type="number" id="amountInput" placeholder="0" min="1" step="1" inputmode="numeric">
+    </div>
+    <div class="field-row">
+      <div class="field-label"><span class="lbl-em">👤</span>誰が払った？</div>
+      <select id="payerSelect"><option value="">選択してください</option></select>
+    </div>
+    <div class="field-submit">
+      <button class="btn-primary" id="paySubmitBtn" onclick="submitPayment()">➕ 追加</button>
     </div>
 
     <!-- Split area -->
@@ -837,7 +921,7 @@
 
   function syncPayerSelect() {
     const sel = $('payerSelect'), cur = sel.value;
-    sel.innerHTML = '<option value="">支払い者</option>' +
+    sel.innerHTML = '<option value="">選択してください</option>' +
       state.members.map(m =>
         `<option value="${esc(m)}"${m===cur?' selected':''}>${esc(m)}</option>`
       ).join('');
@@ -1096,6 +1180,48 @@
     $('result').style.display = 'none';
   }
 
+  // ── 負担内訳 HTML を生成 ──
+  function buildSplitsHTML(p) {
+    const splits = p.splits || [];
+    if (splits.length === 0) {
+      return `<div class="pi-splits"><div class="pi-split-row">
+        <span class="pi-split-name" style="color:var(--text-muted)">負担者なし</span>
+      </div></div>`;
+    }
+
+    // 均等割り判定
+    const participants = splits.map(s => s.userId);
+    const eqSplits = computeEqualSplits(p.amount, participants, p.payer);
+    const isEq = splits.length > 0 && splits.every((s, i) =>
+      s.userId === (eqSplits[i]?.userId) && s.amount === (eqSplits[i]?.amount)
+    );
+
+    if (isEq) {
+      const n     = splits.length;
+      const share = Math.floor(p.amount / n);
+      const rem   = p.amount - share * n;
+      const label = splits.length === state.members.length
+        ? `全員 (${n}人)` : `${n}人`;
+      const remNote = rem > 0
+        ? `<span class="pi-split-rem">+¥${rem} 端数</span>` : '';
+      return `<div class="pi-splits">
+        <div class="pi-split-row">
+          <span class="pi-split-name">${label}</span>
+          <span class="pi-split-amt">${fmt(share)}${remNote}</span>
+        </div>
+      </div>`;
+    }
+
+    // 金額指定: 個別行
+    const rows = splits.map(s =>
+      `<div class="pi-split-row">
+        <span class="pi-split-name">${esc(s.userId)}</span>
+        <span class="pi-split-amt">${fmt(s.amount)}</span>
+      </div>`
+    ).join('');
+    return `<div class="pi-splits">${rows}</div>`;
+  }
+
   function renderPayments() {
     const list = $('paymentList');
     if (state.payments.length === 0) {
@@ -1103,32 +1229,22 @@
       return;
     }
     list.innerHTML = state.payments.map((p, i) => {
-      const splits = p.splits || [];
-      let label = '';
-      if      (splits.length === 0)                    label = '負担者なし';
-      else if (splits.length === state.members.length) label = '全員';
-      else                                             label = splits.map(s => esc(s.userId)).join('・');
-
-      const participants = splits.map(s => s.userId);
-      const eqSplits     = computeEqualSplits(p.amount, participants, p.payer);
-      const isEq = splits.length > 0 && splits.every((s,i) =>
-        s.userId === (eqSplits[i]?.userId) && s.amount === (eqSplits[i]?.amount));
-      if (!isEq && splits.length > 0) label += ' · 金額指定';
-
-      const descPart = (p.desc && p.desc !== '（記録なし）') ? p.desc + ' · ' : '';
+      const hasDesc = p.desc && p.desc !== '（記録なし）';
+      const descTag = hasDesc ? `<span class="pi-desc">${esc(p.desc)}</span>` : '';
       return `
         <div class="payment-item${state.editIndex === i ? ' editing' : ''}">
-          <div class="pi-info">
-            <div class="pi-top">
+          <div class="pi-header-row">
+            <div class="pi-title">
               <span class="pi-payer">${esc(p.payer)}</span>
-              <span class="pi-amount">${fmt(p.amount)}</span>
+              ${descTag}
             </div>
-            <div class="pi-meta">${descPart}${label}</div>
+            <span class="pi-amount">${fmt(p.amount)}</span>
+            <div class="pi-actions">
+              <button class="btn-icon btn-icon-edit" onclick="startEdit(${i})">✏️</button>
+              <button class="btn-icon btn-icon-del"  onclick="removePayment(${i})">✕</button>
+            </div>
           </div>
-          <div class="pi-actions">
-            <button class="btn-icon btn-icon-edit" onclick="startEdit(${i})">✏️</button>
-            <button class="btn-icon btn-icon-del"  onclick="removePayment(${i})">✕</button>
-          </div>
+          ${buildSplitsHTML(p)}
         </div>`;
     }).join('');
   }

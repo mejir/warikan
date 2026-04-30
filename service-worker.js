@@ -1,5 +1,5 @@
 // キャッシュ名にバージョンを含める（更新時にここを変える）
-const CACHE_NAME = 'warikan-v6';
+const CACHE_NAME = 'warikan-v7';
 
 const ASSETS = [
   './',
