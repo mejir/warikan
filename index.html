@@ -472,19 +472,34 @@
     }
     .pi-header-row {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 8px;
     }
-    .pi-title {
+    /* 左カラム: 支払者名（1行目）+ 内容（2行目） */
+    .pi-main {
       flex: 1; min-width: 0;
       display: flex;
-      align-items: baseline;
-      gap: 7px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 3px;
     }
-    .pi-payer  { font-size: 0.88rem; font-weight: 700; }
-    .pi-desc   { font-size: 0.78rem; color: var(--text-muted); }
-    .pi-amount { font-size: 0.98rem; font-weight: 700; color: var(--primary); flex-shrink: 0; }
+    .pi-payer { font-size: 0.92rem; font-weight: 700; line-height: 1.2; }
+    .pi-desc  { font-size: 0.77rem; color: var(--text-muted); line-height: 1.2; }
+    /* 右: 金額 */
+    .pi-amount {
+      font-size: 0.95rem; font-weight: 700; color: var(--primary);
+      flex-shrink: 0;
+      display: flex;
+      align-items: baseline;
+      gap: 3px;
+      white-space: nowrap;
+    }
+    /* 「支払」「負担」の小ラベル */
+    .pi-amt-label {
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
     .pi-actions { display: flex; gap: 5px; flex-shrink: 0; }
 
     /* Splits breakdown */
@@ -1239,7 +1254,7 @@
       return `<div class="pi-splits">
         <div class="pi-split-row">
           <span class="pi-split-name">${label}</span>
-          <span class="pi-split-amt">${fmt(share)}${remNote}</span>
+          <span class="pi-split-amt"><span class="pi-amt-label">負担</span>${fmt(share)}${remNote}</span>
         </div>
       </div>`;
     }
@@ -1248,7 +1263,7 @@
     const rows = splits.map(s =>
       `<div class="pi-split-row">
         <span class="pi-split-name">${esc(s.userId)}</span>
-        <span class="pi-split-amt">${fmt(s.amount)}</span>
+        <span class="pi-split-amt"><span class="pi-amt-label">負担</span>${fmt(s.amount)}</span>
       </div>`
     ).join('');
     return `<div class="pi-splits">${rows}</div>`;
@@ -1262,15 +1277,17 @@
     }
     list.innerHTML = state.payments.map((p, i) => {
       const hasDesc = p.desc && p.desc !== '（記録なし）';
-      const descTag = hasDesc ? `<span class="pi-desc">${esc(p.desc)}</span>` : '';
+      const descLine = hasDesc ? `<span class="pi-desc">${esc(p.desc)}</span>` : '';
       return `
         <div class="payment-item${state.editIndex === i ? ' editing' : ''}">
           <div class="pi-header-row">
-            <div class="pi-title">
+            <div class="pi-main">
               <span class="pi-payer">${esc(p.payer)}</span>
-              ${descTag}
+              ${descLine}
             </div>
-            <span class="pi-amount">${fmt(p.amount)}</span>
+            <span class="pi-amount">
+              <span class="pi-amt-label">支払</span>${fmt(p.amount)}
+            </span>
             <div class="pi-actions">
               <button class="btn-icon btn-icon-edit" onclick="startEdit(${i})">✏️</button>
               <button class="btn-icon btn-icon-del"  onclick="removePayment(${i})">✕</button>
