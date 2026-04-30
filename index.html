@@ -585,21 +585,33 @@
       border-left: 3px solid var(--xfer);
     }
 
-    /* Transfer list */
+    /* Transfer list — grouped by sender */
     .transfer-list { list-style: none; }
-    .transfer-list li {
-      display: flex; align-items: center; gap: 9px;
-      padding: 13px 14px; margin-bottom: 7px;
+    .transfer-group {
+      margin-bottom: 8px;
       background: var(--row-bg);
-      border-radius: 12px;
+      border-radius: 14px;
       border: 1px solid var(--border);
-      font-size: 0.9rem;
+      overflow: hidden;
     }
-    .transfer-list li:last-child { margin-bottom: 0; }
-    .t-from { font-weight: 700; }
-    .t-arrow { color: var(--text-muted); }
-    .t-to   { font-weight: 700; }
-    .t-amt  { margin-left: auto; font-weight: 700; color: var(--primary); font-size: 0.95rem; }
+    .transfer-group:last-child { margin-bottom: 0; }
+    .t-sender-header {
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 10px 14px 8px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    .t-recipient-rows { padding: 4px 0; }
+    .t-recipient-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 14px 7px 22px;
+      font-size: 0.88rem;
+    }
+    .t-arrow { color: var(--text-muted); flex-shrink: 0; }
+    .t-to   { font-weight: 600; flex: 1; min-width: 0; }
+    .t-amt  { margin-left: auto; font-weight: 700; color: var(--primary);
+               font-size: 0.92rem; flex-shrink: 0; }
 
     .no-transfer {
       text-align: center; padding: 18px;
@@ -1343,13 +1355,25 @@
           合計 <strong>${transfers.length} 回</strong> の送金で精算できます
         </p>
         <ul class="transfer-list">
-          ${transfers.map(t => `
-            <li>
-              <span class="t-from">${esc(t.from)}</span>
-              <span class="t-arrow">→</span>
-              <span class="t-to">${esc(t.to)}</span>
-              <span class="t-amt">${fmt(t.amount)}</span>
-            </li>`).join('')}
+          ${(() => {
+            const groups = {};
+            transfers.forEach(t => {
+              if (!groups[t.from]) groups[t.from] = [];
+              groups[t.from].push(t);
+            });
+            return Object.entries(groups).map(([sender, rows]) => `
+              <li class="transfer-group">
+                <div class="t-sender-header">${esc(sender)}</div>
+                <div class="t-recipient-rows">
+                  ${rows.map(t => `
+                    <div class="t-recipient-row">
+                      <span class="t-arrow">→</span>
+                      <span class="t-to">${esc(t.to)}</span>
+                      <span class="t-amt">${fmt(t.amount)}</span>
+                    </div>`).join('')}
+                </div>
+              </li>`).join('');
+          })()}
         </ul>`;
     }
 
